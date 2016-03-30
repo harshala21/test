@@ -1,6 +1,4 @@
-/**
- * Created by vinit on 5/22/15.
- */
+
 public class ClubCF {
 	private String no;
 	private String name;
