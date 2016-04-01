@@ -9,7 +9,7 @@ Connection con;
 ResultSet results;
 PreparedStatement stmt;
 
-	private void getConnection(){
+	/*private void getConnection(){
 		try{
 			Class.forName("oracle.jdbc.OracleDriver");
 			con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","system","honour");
@@ -18,12 +18,13 @@ PreparedStatement stmt;
 		}catch ( SQLException e){
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	public static void main(String[] args) {
 		Rating rating = new Rating();
 		try{
-			rating.getConnection();
+			DBConnection conne = new DBConnection(); 
+			rating.con = conne.getDBConnection();
 			String query = "select users,s2,s5,s1,s3,s4,s7,s6 from rating_matrix";
 			rating.stmt = rating.con.prepareStatement(query);
 			rating.results = rating.stmt.executeQuery();
