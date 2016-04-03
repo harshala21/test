@@ -25,7 +25,7 @@ PreparedStatement stmt;
 		try{
 			DBConnection conne = new DBConnection(); 
 			rating.con = conne.getDBConnection();
-			String query = "select users,s2,s5,s1,s3,s4,s7,s6 from rating_matrix";
+			String query = "select  from rating_matrix";
 			rating.stmt = rating.con.prepareStatement(query);
 			rating.results = rating.stmt.executeQuery();
 			System.out.println("\t|\ts2\ts5\t|\ts1\ts3\ts4\ts7\t|\ts6");
