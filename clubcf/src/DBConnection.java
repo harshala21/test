@@ -6,6 +6,7 @@ import java.util.List;
 public class DBConnection {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+	//static final String DB_URL = "jdbc:mysql://192.168.0.106/clubcf";
 	static final String DB_URL = "jdbc:mysql://localhost/clubcf";
 	static final String mashupService = "sample_data";
 	//static final String sampleData = "sample_data";
@@ -13,7 +14,7 @@ public class DBConnection {
 	
 	// Database credentials
 	static final String USER = "root";
-	static final String PASS = "";
+	static final String PASS = "honour";
 
 	public Connection getDBConnection() {
 		Connection conn = null;

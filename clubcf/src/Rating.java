@@ -25,10 +25,9 @@ PreparedStatement stmt;
 		try{
 			DBConnection conne = new DBConnection(); 
 			rating.con = conne.getDBConnection();
-			String query = "select  from rating_matrix";
+			String query = "select u.username, rm.ratings, sd.sid from rating_matrix rm inner join  users u on rm.user_id = u.user_id inner join sample_data sd on rm.service_id = sd.id";
 			rating.stmt = rating.con.prepareStatement(query);
 			rating.results = rating.stmt.executeQuery();
-			System.out.println("\t|\ts2\ts5\t|\ts1\ts3\ts4\ts7\t|\ts6");
 			while(rating.results.next()){
 				
 			}
@@ -38,7 +37,13 @@ PreparedStatement stmt;
 		}
 	} 	
 	
-	public void calculateRatingSimilarity(double[] serviceX,double[] serviceY){
+/*	private double[] getNumberOfUsers(int serviceID){
+		try{
+			String query = "select from "
+		}
+	}*/
+	
+	public double calculateRatingSimilarity(double[] serviceX,double[] serviceY){
 		double meanX = getMean(serviceX);
 		double meanY = getMean(serviceY);
 		double numerator = 0;
@@ -49,7 +54,12 @@ PreparedStatement stmt;
 			denominatorX += Math.pow((serviceX[i] - meanX), 2);
 			denominatorY += Math.pow(( serviceY[i] - meanY), 2);
 		}
-		double ratingSimilarity = numerator /(Math.sqrt(denominatorX) * Math.sqrt(denominatorY));
+		return numerator /(Math.sqrt(denominatorX) * Math.sqrt(denominatorY));
+	}
+	
+	public double calculateEnhancedRatingSimilarity(){
+		
+		return 0d;
 	}
 	
 	
