@@ -1,7 +1,12 @@
+package clubcf.factory;
+
 import java.awt.image.SampleModel;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import dummy.ClubCF;
+import dummy.Services;
 
 public class DBConnection {
 	// JDBC driver name and database URL
@@ -26,6 +31,31 @@ public class DBConnection {
 		}
 
 		return conn;
+	}
+	
+	public void close(PreparedStatement stmt ){
+		try {
+			stmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void close(ResultSet result ){
+		try {
+			result.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void close(Connection con ){
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public List getDBRecords(int limit) {

@@ -1,3 +1,4 @@
+package dummy;
 import java.io.*;
 
 class NewString {

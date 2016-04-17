@@ -1,3 +1,4 @@
+package dummy;
 public class Services {
 	private float s1;
 	private float s2;
@@ -10,6 +11,9 @@ public class Services {
 	private float s9;
 	private float s10;
 
+	private long serviceID;
+	private String serviceName;
+	
 	public float getS1() {
 		return s1;
 	}
@@ -93,4 +97,21 @@ public class Services {
 	public String toString() {
         return String.format("%.3f", getS1()) +  "\t" + String.format("%.3f", getS2()) + "\t" + String.format("%.3f", getS3()) + "\t" + String.format("%.3f", getS4()) + "\t" + String.format("%.3f", getS5()) + "\t" + String.format("%.3f", getS6()) + "\t" + String.format("%.3f", getS7()) + "\t" + String.format("%.3f", getS8()) + "\t" + String.format("%.3f", getS9()) + "\t" + String.format("%.3f", getS10());
     }
+
+	public long getServiceID() {
+		return serviceID;
+	}
+
+	public void setServiceID(long serviceID) {
+		this.serviceID = serviceID;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
 }

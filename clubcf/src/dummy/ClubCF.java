@@ -1,3 +1,4 @@
+package dummy;
 
 public class ClubCF {
 	private String no;
