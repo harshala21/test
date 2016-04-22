@@ -42,7 +42,7 @@ public static void main(String[] args) {
 			ArrayList<ServicePair> pairs = servicePairs.get(itr.next());
 			for(ServicePair pair : pairs){
 				System.out.print("("+pair.getUnRatedServiceID()+","+pair.getOtherServiceID()+")\t");
-				System.out.println(pair.getRatingSimilarity());
+				System.out.println(pair.getRatingSimilarity()+"\t"+pair.getEnhancedRatingSimilarity());
 			}
 		}
 	} 	
@@ -52,7 +52,7 @@ public static void main(String[] args) {
 		Iterator<Long> itr = servicePairs.keySet().iterator();
 		while(itr.hasNext()){
 			pairList = servicePairs.get(itr.next());
-			calculateRatingSimialrity(pairList);
+			calculateRatingSimialrity(pairList);	
 		}
 	}
 
