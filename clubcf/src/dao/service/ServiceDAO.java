@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import clubcf.factory.DBConnection;
 import dao.DAO;
+import dummy.ServicePair;
 import dummy.Services;
 
 public class ServiceDAO implements DAO {
@@ -109,15 +110,16 @@ public class ServiceDAO implements DAO {
 		return convertToArray(dataDB);
 	}
 	
-	public long getNonZeroRatingSize(long serviceID){
-		long ratingCount = 0;
+	public double getNonZeroRatingSize(long serviceID){
+		double ratingCount = 0;
 		String query = "select count(ratings) from rating_matrix where service_id =? and user_id in (1,2,3,4) and ratings != 0";
 		try {
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
 			results = stmt.executeQuery();
-			ratingCount = results.getLong(1);
+			results.next();
+			ratingCount = results.getDouble(1);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}finally {
@@ -136,5 +138,27 @@ public class ServiceDAO implements DAO {
 			count++;
 		}
 		return data;
+	}
+
+	public double getPairIntesection(ServicePair pair) {
+		double ratingCount = 0;
+		String query = "select count(ratings) from rating_matrix where service_id = ? and user_id not in (select user_id from rating_matrix where ratings = 0 and service_id = ?);";
+		try {
+			
+			con = openConnection();
+			stmt = con.prepareStatement(query);
+			stmt.setLong(1, pair.getOtherServiceID());
+			stmt.setLong(2, pair.getUnRatedServiceID());
+			results = stmt.executeQuery();
+			results.next();
+			ratingCount = results.getDouble(1);
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		return ratingCount;
 	}
 }

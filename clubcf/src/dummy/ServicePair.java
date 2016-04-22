@@ -62,4 +62,11 @@ public class ServicePair {
 	public void setEnhancedRatingSimilarity(double enhancedRatingSimilarity) {
 		this.enhancedRatingSimilarity = enhancedRatingSimilarity;
 	}
+	public long getInterSection() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	public long getRatedUsersCount(long serviceID) {
+		return 0;
+	}
 }

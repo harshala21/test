@@ -67,7 +67,7 @@ public static void main(String[] args) {
 			meanUnRated = getMean(dao.getSimlarityRatings(pair.getUnRatedServiceID()));
 			meanOther = getMean(dao.getSimlarityRatings(pair.getOtherServiceID()));
 			pair.setRatingSimilarity(calculateRatingSimilarity(dao.getSimlarityRatings(pair.getUnRatedServiceID()), dao.getSimlarityRatings(pair.getOtherServiceID()), meanUnRated, meanOther));
-			//pair.setEnhancedRatingSimilarity(calculateEnhancedRatingSimilarity(pair.getRatingSimilarity(),dao.getNonZeroRatingSize(pair.getUnRatedServiceID(),dao.getNonZeroRatingSize(pair.getOtherServiceID(), )));
+			pair.setEnhancedRatingSimilarity(calculateEnhancedRatingSimilarity(pair.getRatingSimilarity(),dao.getNonZeroRatingSize(pair.getUnRatedServiceID()),dao.getNonZeroRatingSize(pair.getOtherServiceID()),dao.getPairIntesection(pair)));
 		}
 	}
 
@@ -205,7 +205,7 @@ public static void main(String[] args) {
 		return numerator /(Math.sqrt(denominatorX) * Math.sqrt(denominatorY));
 	}
 	
-	public double calculateEnhancedRatingSimilarity(double ratingSimilarity, long xLength, long yLength, long xyIntersection){
+	public double calculateEnhancedRatingSimilarity(double ratingSimilarity, double xLength, double yLength, double xyIntersection){
 		return ((2 * (xyIntersection))/(xLength+yLength))* ratingSimilarity;
 	}
 	
