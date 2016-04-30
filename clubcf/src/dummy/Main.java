@@ -361,9 +361,9 @@ public class Main {
 				stemword += ",";
 			}
 			String word = strings[i];
-			char[] w = new char[501];
+			//char[] w = new char[501];
 			Stemmer s = new Stemmer();
-			String u;
+			//String u;
 			char[] array = word.toCharArray();
 			for (char ch : array) {
 				ch = Character.toLowerCase((char) ch);

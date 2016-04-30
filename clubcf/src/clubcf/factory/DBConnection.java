@@ -150,7 +150,7 @@ public class DBConnection {
 		}
 	}
 	
-	public List get2Step(int limit) {
+	/*public List get2Step(int limit) {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -193,5 +193,5 @@ public class DBConnection {
 		}
 		
 		return dbList;
-	}
+	}*/
 }
