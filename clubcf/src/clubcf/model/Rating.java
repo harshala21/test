@@ -1,4 +1,4 @@
-package dummy;
+package clubcf.model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import clubcf.dao.service.ServiceDAO;
 import clubcf.factory.DBConnection;
-import dao.service.ServiceDAO;
 import oracle.net.ano.Service;
 
 public class Rating {

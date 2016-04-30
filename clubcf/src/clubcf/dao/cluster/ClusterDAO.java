@@ -1,10 +1,10 @@
-package dao.cluster;
+package clubcf.dao.cluster;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import dao.DAO;
+import clubcf.dao.DAO;
 
 public class ClusterDAO implements DAO {
 

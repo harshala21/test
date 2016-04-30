@@ -1,4 +1,4 @@
-package dummy;
+package clubcf.model;
 public class Services {
 	private float s1;
 	private float s2;

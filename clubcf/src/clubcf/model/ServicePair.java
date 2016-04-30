@@ -1,4 +1,4 @@
-package dummy;
+package clubcf.model;
 
 public class ServicePair {
 	private long clusterID;

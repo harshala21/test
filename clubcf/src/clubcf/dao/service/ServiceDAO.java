@@ -1,4 +1,4 @@
-package dao.service;
+package clubcf.dao.service;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,10 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import clubcf.dao.DAO;
 import clubcf.factory.DBConnection;
-import dao.DAO;
-import dummy.ServicePair;
-import dummy.Services;
+import clubcf.model.ServicePair;
+import clubcf.model.Services;
 
 public class ServiceDAO implements DAO {
 	Connection con = null;

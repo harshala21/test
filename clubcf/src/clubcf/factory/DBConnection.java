@@ -5,15 +5,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import dummy.ClubCF;
-import dummy.Services;
+import clubcf.model.ClubCF;
+import clubcf.model.Services;
 
 public class DBConnection {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	//static final String DB_URL = "jdbc:mysql://192.168.0.106/clubcf";
 	static final String DB_URL = "jdbc:mysql://localhost/clubcf";
-	static final String mashupService = "sample_data";
+	static final String mashupService = "mashup_service";
 	//static final String sampleData = "sample_data";
 	static final String averageTable = "average";
 	
