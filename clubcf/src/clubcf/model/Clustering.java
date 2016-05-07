@@ -45,6 +45,10 @@ public class Clustering {
 		 return intersection(stemWordX, stemWordY)/ union(stemWordX, stemWordY);
 	}
 	
+	private double calculateSimilarityMatrix(){
+		
+	}
+	
 	private float union(List<String> list1, List<String> list2) {	
 		Set<String> set = new HashSet<String>();
 		set.addAll(list1);
