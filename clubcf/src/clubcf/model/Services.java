@@ -5,8 +5,17 @@ public class Services {
 	private String serviceName;
 	private String stemWord;
 	private String apiName;
+	private String symanticStemWords;
 	
 	
+	public String getSymanticStemWords() {
+		return symanticStemWords;
+	}
+
+	public void setSymanticStemWords(String symanticStemWords) {
+		this.symanticStemWords = symanticStemWords;
+	}
+
 	public String getStemWord() {
 		return stemWord;
 	}
