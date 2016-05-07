@@ -1,4 +1,4 @@
-package dummy;
+package clubcf.model;
 
 public class ClubCF {
 	private String no;

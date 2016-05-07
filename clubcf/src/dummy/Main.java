@@ -10,7 +10,9 @@ import java.util.Set;
 
 import org.apache.poi.ss.formula.functions.T;
 
+import clubcf.algo.Stemmer;
 import clubcf.factory.DBConnection;
+import clubcf.model.ClubCF;
 
 public class Main {
 
@@ -20,30 +22,24 @@ public class Main {
 		//readExcelAndAddInToDB();
 		DBConnection connection = new DBConnection();
 		List<ClubCF> dbList = connection.getDBRecords(limit);
-		float alpha = (float) 0.5;
+		float alpha =  0.5f;
 		String outPut = "";
 		
 		float matrix[][] = new float[limit][limit];
 		
 		for (int i = 0; i < dbList.size(); i++) {
 			ClubCF t1 = (ClubCF) dbList.get(i);
-			List<String> list1 = new ArrayList<String>(Arrays.asList(t1
-					.getStemWord().split(",")));
-			List<String> list3 = new ArrayList<String>(Arrays.asList(t1
-					.getApis().split(",")));
+			List<String> list1 = new ArrayList<String>(Arrays.asList(t1.getStemWord().split(",")));
+			List<String> list3 = new ArrayList<String>(Arrays.asList(t1.getApis().split(",")));
 			
 			for (int j = 0; j < dbList.size(); j++) {
 				outPut += "'";
 				ClubCF t2 = (ClubCF) dbList.get(j);
-				List<String> list2 = new ArrayList<String>(Arrays.asList(t2
-						.getStemWord().split(",")));
-				List<String> list4 = new ArrayList<String>(Arrays.asList(t2
-						.getApis().split(",")));
+				List<String> list2 = new ArrayList<String>(Arrays.asList(t2.getStemWord().split(",")));
+				List<String> list4 = new ArrayList<String>(Arrays.asList(t2.getApis().split(",")));
 
-				float D_sim = new Main().intersection(list1, list2)
-						/ new Main().union(list1, list2);
-				float F_sim = new Main().intersection(list3, list4)
-						/ new Main().union(list3, list4);
+				float D_sim = new Main().intersection(list1, list2) / new Main().union(list1, list2);
+				float F_sim = new Main().intersection(list3, list4) / new Main().union(list3, list4);
 
 				float C_Sim = (float) (alpha * D_sim + (1 - alpha) * F_sim);
 
@@ -365,9 +361,9 @@ public class Main {
 				stemword += ",";
 			}
 			String word = strings[i];
-			char[] w = new char[501];
+			//char[] w = new char[501];
 			Stemmer s = new Stemmer();
-			String u;
+			//String u;
 			char[] array = word.toCharArray();
 			for (char ch : array) {
 				ch = Character.toLowerCase((char) ch);

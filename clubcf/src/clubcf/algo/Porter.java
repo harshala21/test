@@ -1,4 +1,4 @@
-package dummy;
+package clubcf.algo;
 import java.io.*;
 
 class NewString {
