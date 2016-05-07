@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import clubcf.dao.DAO;
 import clubcf.factory.DBConnection;
@@ -160,5 +161,25 @@ public class ServiceDAO implements DAO {
 			close(con);
 		}
 		return ratingCount;
+	}
+	
+	public List<Services> getAllDetails(){
+		List<Services> allServices = new ArrayList<Services>();
+		String query = "select id,sid,api,stemword from mashup_service order by id ";
+		try {
+			con = openConnection();
+			stmt = con.prepareStatement(query);
+			results = stmt.executeQuery();
+			while(results.next()){
+				allServices.add(new Services(results.getLong(1), results.getString(2), results.getString(3), results.getString(4)));
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		return allServices;
 	}
 }

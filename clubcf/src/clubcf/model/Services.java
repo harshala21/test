@@ -19,6 +19,13 @@ public class Services {
 		return apiName;
 	}
 
+	public Services(long serviceID, String serviceName, String stemWord, String apiName) {
+		this.serviceID = serviceID;
+		this.serviceName = serviceName;
+		this.stemWord = stemWord;
+		this.apiName = apiName;
+	}
+
 	public void setApiName(String apiName) {
 		this.apiName = apiName;
 	}

@@ -1,24 +1,25 @@
 package dummy;
-import java.io.FileInputStream;
-import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import org.apache.poi.ss.formula.functions.T;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import clubcf.algo.Stemmer;
+import clubcf.dao.service.ServiceDAO;
 import clubcf.factory.DBConnection;
 import clubcf.model.ClubCF;
+import clubcf.model.Clustering;
+import clubcf.model.Services;
 
 public class Main {
 
 	static int limit = 7;
 	
-	public static void main(String[] args) throws Exception {
+/*	public static void main(String[] args) throws Exception {
 		//readExcelAndAddInToDB();
 		DBConnection connection = new DBConnection();
 		List<ClubCF> dbList = connection.getDBRecords(limit);
@@ -60,8 +61,46 @@ public class Main {
 		
 		PrintMatrix(matrix, 7);
 	}
+*/
 	
-	public static void PrintMatrix(float step1[][], float limit) {
+	public static void main(String[] args){
+		ServiceDAO dao = new ServiceDAO();
+		SortedMap<String,List<Double>> similarityMatrix = new TreeMap<String,List<Double>>();
+		List<Services> allServices = dao.getAllDetails();
+		List<Services> allServicesDuplicate =allServices;
+		Iterator<Services> itrOuter = allServices.iterator();
+		Clustering clusterSerivice = new Clustering();
+		while(itrOuter.hasNext()){
+			Iterator<Services> itrInner = allServicesDuplicate.iterator();
+			Services serviceX = itrOuter.next();
+			ArrayList<Double> similiarity = new ArrayList<Double>();
+			similarityMatrix.put(serviceX.getServiceName(), similiarity);
+			while(itrInner.hasNext()){
+				similiarity.add(clusterSerivice.calculateCharacteristicSimilarity(serviceX, itrInner.next()));
+			}
+		}
+		printMatrix(similarityMatrix);
+		
+	}
+	
+	public static void printMatrix(Map<String,List<Double>> matrix){
+		Iterator<String> keys = matrix.keySet().iterator();
+		while(keys.hasNext())
+			System.out.print("\t"+keys.next());
+		System.out.println();
+		keys = matrix.keySet().iterator();
+		while(keys.hasNext()){
+			String key = keys.next();
+			System.out.print(key);
+			for(Double similarityValue: matrix.get(key))
+				System.out.printf( similarityValue == -1 ? "\t/" : "\t%.3f", similarityValue);
+			System.out.println();
+		}
+	}
+	
+	
+	
+	/*public static void PrintMatrix(float step1[][], float limit) {
 		float maxInColumn = 0;
 		int row = 0;
 		int column = 0;
@@ -86,7 +125,7 @@ public class Main {
 		System.out.print("\n\n\n");
 		
 		Step2Matrix(step1, row, column, 6);
-	}
+	}*/
 	
 	public static void Step2Matrix(float step1[][], int row,int column, int limit) {
 		float maxInColumn = 0;

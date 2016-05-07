@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.omg.PortableServer.ServantRetentionPolicyValue;
+
 public class Clustering {
 
 	double alpha = 0.5;
@@ -21,8 +23,10 @@ public class Clustering {
 	 * 5. Save to DB.  
 	 */
 	
-	public double calculateCharacteristicSimilarity(double dSim,double fSim){
-		return getAlpha() * dSim + (1 - getAlpha()) * fSim ;
+	public double calculateCharacteristicSimilarity(Services serviceX, Services serviceY){
+		double dSim = calculateDescriptionSimilarity( serviceX, serviceY);
+		double fSim = calculateFunctionalitySimilarity( serviceX, serviceY);
+		return serviceX.getServiceID() == serviceY.getServiceID() ? -1d : getAlpha() * dSim + (1 - getAlpha()) * fSim ;
 	}
 	
 	public double getAlpha() {
@@ -33,20 +37,16 @@ public class Clustering {
 		this.alpha = alpha;
 	}
 
-	public double calculateDescriptionSimilarity(Services serviceX, Services serviceY){
+	private double calculateDescriptionSimilarity(Services serviceX, Services serviceY){
 		List<String> stemWordX = new ArrayList<String>(Arrays.asList(serviceX.getStemWord().split(",")));
 		List<String> stemWordY = new ArrayList<String>(Arrays.asList(serviceY.getStemWord().split(",")));
 		return  intersection(stemWordX, stemWordY)/ union(stemWordX, stemWordY);
 	}
 	
-	public double calculateFunctionalitySimilarity(Services serviceX, Services serviceY){
+	private double calculateFunctionalitySimilarity(Services serviceX, Services serviceY){
 		 List<String> stemWordX = new ArrayList<String>(Arrays.asList(serviceX.getApiName().split(",")));
 		List<String> stemWordY = new ArrayList<String>(Arrays.asList(serviceY.getApiName().split(",")));
 		 return intersection(stemWordX, stemWordY)/ union(stemWordX, stemWordY);
-	}
-	
-	private double calculateSimilarityMatrix(){
-		
 	}
 	
 	private float union(List<String> list1, List<String> list2) {	
