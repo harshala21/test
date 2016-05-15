@@ -90,7 +90,7 @@ public class ServiceDAO implements DAO {
 		
 		ArrayList<Double> dataDB = new ArrayList<Double>();
 		try{
-			String query = "select ratings from rating_matrix where service_id = ?)";
+			String query = "select ratings from rating_matrix where service_id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
