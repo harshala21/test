@@ -68,7 +68,7 @@ public class ServiceDAO implements DAO {
 	public double[] getMeanRatings(long serviceID) {
 		ArrayList<Double> data = new ArrayList<Double>();
 		try{
-			String query = "select ratings from rating_matrix where service_id = ? and user_id in (1,2,3,4)";
+			String query = "select ratings from rating_matrix where service_id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
@@ -90,7 +90,7 @@ public class ServiceDAO implements DAO {
 		
 		ArrayList<Double> dataDB = new ArrayList<Double>();
 		try{
-			String query = "select ratings from rating_matrix where service_id = ? and user_id in (1,2,4)";
+			String query = "select ratings from rating_matrix where service_id = ?)";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
@@ -113,7 +113,7 @@ public class ServiceDAO implements DAO {
 	
 	public double getNonZeroRatingSize(long serviceID){
 		double ratingCount = 0;
-		String query = "select count(ratings) from rating_matrix where service_id =? and user_id in (1,2,3,4) and ratings != 0";
+		String query = "select count(ratings) from rating_matrix where service_id =? and ratings != 0";
 		try {
 			con = openConnection();
 			stmt = con.prepareStatement(query);
