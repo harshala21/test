@@ -25,21 +25,21 @@ public class Main {
 		List<Services> allServices = dao.getAllDetails(10);
 		List<Services> allServicesDuplicate =allServices;
 		Iterator<Services> itrOuter = allServices.iterator();
-		Clustering clusterSerivice = new Clustering();
+		Clustering clusterService = new Clustering();
 		while(itrOuter.hasNext()){
 			Iterator<Services> itrInner = allServicesDuplicate.iterator();
 			Services serviceX = itrOuter.next();
 			ArrayList<Double> similiarity = new ArrayList<Double>();
 			similarityMatrix.put(serviceX.getServiceName(), similiarity);
 			while(itrInner.hasNext()){
-				similiarity.add(clusterSerivice.calculateCharacteristicSimilarity(serviceX, itrInner.next(),isWordNet));
+				similiarity.add(clusterService.calculateCharacteristicSimilarity(serviceX, itrInner.next(),isWordNet));
 				getMax(similiarity,serviceX.getServiceName());
 			}
 		}
 		printMatrix(similarityMatrix);
 		for(int i = 0 ; i < 3; i++){
 			Main.maxValue =0;
-			clusterSerivice.reductionStep(similarityMatrix, Main.serviceName, Main.index);
+			clusterService.reductionStep(similarityMatrix, Main.serviceName, Main.index);
 			printMatrix(similarityMatrix);
 		}
 	}
