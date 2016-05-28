@@ -17,34 +17,11 @@ Connection con;
 ResultSet results;
 PreparedStatement stmt;
 DBConnection conne = new DBConnection();
-static ServiceDAO dao = new ServiceDAO();		
+public static ServiceDAO dao = new ServiceDAO();		
 	
 
 public static void main(String[] args) {
-		Rating rating = new Rating();
 		
-		rating.diplayRatingMatrix();
-		System.out.println();
-		ArrayList<Long> unRatedServices = dao.findUnratedServices(0);
-		HashMap<Long,ArrayList<ServicePair>> servicePairs = new HashMap<Long,ArrayList<ServicePair>>();
-		for(long id : unRatedServices){
-			long clusterID = rating.findClusters(id);
-			if(rating.getClusterSize(clusterID) == 1){
-				continue;
-			}
-			servicePairs.put(id, rating.createServiceGroups(id,clusterID));
-		}
-		
-		rating.calculateRatingSimialrity(servicePairs);
-		Iterator< Long> itr = servicePairs.keySet().iterator();
-		System.out.println("Rating Matrix");
-		while(itr.hasNext()){
-			ArrayList<ServicePair> pairs = servicePairs.get(itr.next());
-			for(ServicePair pair : pairs){
-				System.out.print("("+pair.getUnRatedServiceID()+","+pair.getOtherServiceID()+")\t");
-				System.out.println(pair.getRatingSimilarity()+"\t"+pair.getEnhancedRatingSimilarity());
-			}
-		}
 	} 	
 	
 	public void calculateRatingSimialrity(HashMap<Long, ArrayList<ServicePair>> servicePairs) {
@@ -63,7 +40,6 @@ public static void main(String[] args) {
 		double meanOther = 0;
 		
 		for(ServicePair pair : pairList){
-			
 			meanUnRated = getMean(dao.getSimlarityRatings(pair.getUnRatedServiceID()));
 			meanOther = getMean(dao.getSimlarityRatings(pair.getOtherServiceID()));
 			pair.setRatingSimilarity(calculateRatingSimilarity(dao.getSimlarityRatings(pair.getUnRatedServiceID()), dao.getSimlarityRatings(pair.getOtherServiceID()), meanUnRated, meanOther));
@@ -105,7 +81,7 @@ public static void main(String[] args) {
 		return servicePair.size() > 0 ? servicePair : null;
 	}
 
-	private void diplayRatingMatrix(){
+	public void diplayRatingMatrix(){
 		try{
 			System.out.println("Initial Rating Data:");
 			con = conne.getDBConnection();
@@ -208,7 +184,6 @@ public static void main(String[] args) {
 	public double calculateEnhancedRatingSimilarity(double ratingSimilarity, double xLength, double yLength, double xyIntersection){
 		return ((2 * (xyIntersection))/(xLength+yLength))* ratingSimilarity;
 	}
-	
 	
 	
 	private double getMean(double[] service){

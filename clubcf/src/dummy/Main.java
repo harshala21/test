@@ -1,54 +1,164 @@
 package dummy;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Scanner;
 
 import clubcf.algo.Stemmer;
+import clubcf.dao.UserDAO;
 import clubcf.dao.service.ServiceDAO;
 import clubcf.factory.DBConnection;
 import clubcf.model.ClubCF;
+import clubcf.model.Cluster;
 import clubcf.model.Clustering;
+import clubcf.model.Rating;
+import clubcf.model.ServicePair;
 import clubcf.model.Services;
 
 public class Main {
 
-	static String serviceName = "";
+	static int row = -1;
 	static double maxValue = 0d;
 	static int index =-1;
 	static boolean isWordNet = false;
 
 	public static void main(String[] args){
-		ServiceDAO dao = new ServiceDAO();
-		Map<String,List<Double>> similarityMatrix = new LinkedHashMap<String,List<Double>>();
-		List<Services> allServices = dao.getAllDetails(10);
-		List<Services> allServicesDuplicate =allServices;
-		Iterator<Services> itrOuter = allServices.iterator();
-		Clustering clusterService = new Clustering();
-		while(itrOuter.hasNext()){
-			Iterator<Services> itrInner = allServicesDuplicate.iterator();
-			Services serviceX = itrOuter.next();
-			ArrayList<Double> similiarity = new ArrayList<Double>();
-			similarityMatrix.put(serviceX.getServiceName(), similiarity);
-			while(itrInner.hasNext()){
-				similiarity.add(clusterService.calculateCharacteristicSimilarity(serviceX, itrInner.next(),isWordNet));
-				getMax(similiarity,serviceX.getServiceName());
-			}
-		}
-		printMatrix(similarityMatrix);
-		for(int i = 0 ; i < 3; i++){
-			Main.maxValue =0;
-			clusterService.reductionStep(similarityMatrix, Main.serviceName, Main.index);
-			printMatrix(similarityMatrix);
-		}
+		System.out.println("Club CF");
+		Scanner sc = new Scanner(System.in);
+		 int choice = -1;
+		 do{
+			 choice  = printMenu(sc);
+			 switch(choice){
+			 case 1:
+				 	System.out.println("Choosen Clustering");
+				 	int innerChoice = printClusteringMenu(sc);
+				 	switch(innerChoice){
+				 	case 0:
+				 		System.out.println("Not Implemented");
+				 		break;
+				 	case 1:
+				 		ServiceDAO dao = new ServiceDAO();
+						List<Cluster> similarityMatrix = new ArrayList<Cluster>();
+						List<Services> allServices = dao.getAllDetails(10);
+						Clustering clusterService = new Clustering();
+						for(int row=0 ; row < allServices.size(); row++){
+							Cluster cluster = new Cluster(); 
+							Services serviceX = allServices.get(row);
+							cluster.setName(serviceX.getServiceName());
+							ArrayList<Double> similiarity = new ArrayList<Double>();
+							cluster.setValues(similiarity);
+							similarityMatrix.add(cluster);
+							for(int innerRow = 0; innerRow < allServices.size();innerRow++){
+								similiarity.add(clusterService.calculateCharacteristicSimilarity(serviceX, allServices.get(innerRow),isWordNet));
+								getMax(similiarity,row);
+							}
+						}
+						printMatrix(similarityMatrix);
+						sc.next();
+						for(int i = 0 ; i < 4; i++){
+							Main.maxValue =0;
+							clusterService.reductionStep(similarityMatrix, Main.row, Main.index);
+							printMatrix(similarityMatrix);
+							sc.next();
+						}
+						break;
+				 	case 3:
+				 		System.out.println("Not Implemented");
+				 		break;
+				 	}
+				 	
+				 break;
+			 case 2:
+				 System.out.println("Choosen Flitering");
+				 	Rating rating = new Rating();
+				 	int activeUserID = printAndAcceptUser(sc);
+					//rating.diplayRatingMatrix();
+					System.out.println();
+					ArrayList<Long> unRatedServices = Rating.dao.findUnratedServices(0);
+					HashMap<Long,ArrayList<ServicePair>> servicePairs = new HashMap<Long,ArrayList<ServicePair>>();
+					for(long id : unRatedServices){
+						long clusterID = rating.findClusters(id);
+						if(rating.getClusterSize(clusterID) == 1){
+							continue;
+						}
+						servicePairs.put(id, rating.createServiceGroups(id,clusterID));
+					}
+					rating.calculateRatingSimialrity(servicePairs);
+					Iterator< Long> itr = servicePairs.keySet().iterator();
+					System.out.println("Rating Matrix");
+					while(itr.hasNext()){
+						ArrayList<ServicePair> pairs = servicePairs.get(itr.next());
+						for(ServicePair pair : pairs){
+							System.out.print("("+pair.getUnRatedServiceID()+","+pair.getOtherServiceID()+")\t");
+							System.out.println(pair.getRatingSimilarity()+"\t"+pair.getEnhancedRatingSimilarity());
+						}
+					}
+				 break;
+			 case 3:
+				 System.out.println("Choosen Recommendation");
+				 break;
+			 case 0:
+				 break;
+			 default:
+				 System.out.println("invalid Choice. PLease Try again");
+				 break;
+			 }
+		 }while(choice != 0);
+		 sc.close();
 	}
 	
-	public static void getMax(List<Double> similarity, String serviceName) {
+	private static int printAndAcceptUser(Scanner sc) {
+		int count = new UserDAO().getUsersCount();
+		int input = -1;
+		try{
+			
+			System.out.println("Enter User ID ( from 1 to "+count+" )");
+			System.out.print("Your Choice: ");
+			input =  sc.nextInt();
+			if(input <= 0 || input > count)
+				throw new RuntimeException();
+		 }catch(RuntimeException e){
+			 System.out.println("Input should be within provided range!");
+			 return printAndAcceptUser(sc);
+		}catch(Exception e){
+			 System.out.println("Input should be only be Integers and !\n Halting System ");
+		 }
+		
+		return 0;	
+	}
+
+	private static int printMenu(Scanner sc) {
+		try{
+			System.out.println("0. Exit\n1. Phase I Clustering\n2. Flitering\n3. Recommendation\n4. Result");
+			System.out.print("Your Choice: ");
+			return sc.nextInt();
+		 }catch(Exception e){
+			 System.out.println("Input should be only be Integers!\n Halting System ");
+		 }
+		
+		return 0;	
+	}
+	
+	private static int printClusteringMenu(Scanner sc) {
+		try{
+			System.out.println("0. Previous Menu \n1. Without WordNet\n2. With WordNet");
+			System.out.print("Your Choice: ");
+			return sc.nextInt();
+		 }catch(Exception e){
+			 System.out.println("Input should be only be Integers!\n Halting System ");
+		 }
+		
+		return 0;	
+	}
+	
+	
+
+	public static void getMax(List<Double> similarity, int row) {
 		int index = 0;
 		for(double value : similarity ){
 			if(value > Main.maxValue){
-				Main.serviceName = serviceName;
+				Main.row = row;
 				Main.maxValue =  value;
 				Main.index = index;
 			}
@@ -56,20 +166,20 @@ public class Main {
 		}
 	}
 
-	public static void printMatrix(Map<String,List<Double>> matrix){
-		Iterator<String> keys = matrix.keySet().iterator();
+	public static void printMatrix(List<Cluster> similarityMatrix){
+		Iterator<Cluster> keys = similarityMatrix.iterator();
 		while(keys.hasNext())
-			System.out.print("\t"+keys.next());
+			System.out.print("\t"+keys.next().getName());
 		System.out.println();
-		keys = matrix.keySet().iterator();
+		keys = similarityMatrix.iterator();
 		while(keys.hasNext()){
-			String key = keys.next();
-			System.out.print(key);
-			for(Double similarityValue: matrix.get(key))
+			Cluster key = keys.next();
+			System.out.print(key.getName());
+			for(Double similarityValue: key.getValues())
 				System.out.printf( similarityValue == -1 ? "\t/" : "\t%.3f", similarityValue);
 			System.out.println();
 		}
-		System.out.println("Max Value: "+Main.maxValue+"Present At ("+Main.serviceName+","+Main.index+") and ("+Main.index+","+Main.serviceName+")");
+		System.out.println("Max Value: "+Main.maxValue+"\nPresent At ("+Main.row+","+Main.index+") and ("+Main.index+","+Main.row+")");
 	}
 	
 	public static void readExcelAndAddInToDB() throws Exception {

@@ -68,28 +68,35 @@ public class Clustering {
 		return list.size();
 	}
 	
-	public void reductionStep(Map<String,List<Double>> matrix,String serviceName,int index ){
-		removeRow(matrix,index);
-		computeColumn(matrix,Integer.parseInt(serviceName.substring(1)),index);
+	public void reductionStep(List<Cluster> similarityMatrix,int row,int index ){
+		String columnService = similarityMatrix.get(index).getName(); 
+		computeColumn(similarityMatrix,row,index);
+		removeRow(similarityMatrix,index);
+		similarityMatrix.get(row).setName(similarityMatrix.get(row).getName()+","+columnService);
 	}
 
-	private void computeColumn(Map<String, List<Double>> matrix, int row, int column) {
-		Iterator<String> itr = matrix.keySet().iterator();
-		int index =0;
-		while(itr.hasNext()){
-			String serviceName = itr.next();
-			List<Double> similarityValues = matrix.get(serviceName);
-			similarityValues.set(row-1, similarityValues.get(row-1) != -1 && similarityValues.get(column) != -1 ? (similarityValues.get(row-1)+ similarityValues.get(column))/2 : -1d);
-			matrix.get("S"+row).set(index, similarityValues.get(row-1));
-			similarityValues.remove(column);
-			Main.getMax(similarityValues, serviceName);
-			index++;
+	private void computeColumn(List<Cluster> similarityMatrix, int row, int column){
+		int index=0;
+		List<Double> similarityValues = null;
+		try{
+			for(; index < similarityMatrix.size(); index++){
+				Cluster serviceName = similarityMatrix.get(index);
+				similarityValues = serviceName.getValues();
+				similarityValues.set(row, similarityValues.get(row) != -1 && similarityValues.get(column) != -1 ? (similarityValues.get(row)+ similarityValues.get(column))/2 : -1d);
+				if(similarityMatrix.get(row).getValues().size() > index)
+					similarityMatrix.get(row).getValues().set(index, similarityValues.get(row));
+				similarityValues.remove(column);
+				Main.getMax(similarityValues, index);
+			}
+		}catch(IndexOutOfBoundsException e){
+			System.out.println("index:\t"+index+"\n Row:\t"+row+"\nColumn:\t"+column);
+			System.out.println("matrix:\t"+similarityMatrix.size()+"\n Values:\t"+similarityValues.size());
+			e.printStackTrace();
 		}
-		
 	}
 
-	private void removeRow(Map<String, List<Double>> matrix, int index) {
-		matrix.remove("S"+(index+1));		
+	private void removeRow(List<Cluster> similarityMatrix, int index) {
+		similarityMatrix.remove(index);		
 	}
 	
 }
