@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,13 +40,14 @@ public class ServiceDAO implements DAO {
 		connection.close(stmt);
 	}
 	
-	public ArrayList<Long> findUnratedServices( double rating){
+	public ArrayList<Long> findUnratedServices( double rating, int activeUserID){
 		ArrayList<Long> unRatedServices = new ArrayList<Long>();
 		try{
-			String query = "select service_id from rating_matrix  where ratings = ?";
+			String query = "select service_id from rating_matrix  where ratings = ? and user_id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setDouble(1, rating);
+			stmt.setInt(2, activeUserID);
 			results = stmt.executeQuery();
 			while(results.next()){
 				unRatedServices.add(results.getLong(1));
@@ -90,11 +92,36 @@ public class ServiceDAO implements DAO {
 		
 		ArrayList<Double> dataDB = new ArrayList<Double>();
 		try{
-			String query = "select ratings from rating_matrix where service_id = ?";
+			String query = "select ratings from rating_matrix where service_id = ? and ratings != 0";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
 			results = stmt.executeQuery();
+			int count = 0;
+			while(results.next()){
+				dataDB.add(results.getDouble(1));
+				count++;
+			}
+		}catch (SQLException w){
+			w.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		
+		return convertToArray(dataDB);
+	}
+	
+public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
+		
+		ArrayList<Double> dataDB = new ArrayList<Double>();
+		try{
+			String query = "select ratings from rating_matrix where service_id ="+serviceID+" and user_id not in  (select user_id from rating_matrix where service_id in ("+getClusterServices(clusterID)+")  and ratings = 0)";
+			System.out.println(query);
+			con = openConnection();
+			Statement stmt = con.createStatement();			
+			results = stmt.executeQuery(query);
 			int count = 0;
 			while(results.next()){
 				dataDB.add(results.getDouble(1));
@@ -182,5 +209,30 @@ public class ServiceDAO implements DAO {
 			close(con);
 		}
 		return allServices;
+	}
+	
+	public String getClusterServices( long clusterID){
+		String services = "";
+		try{
+			String query  = "select services from clusters where cluster_id = ?";
+			con = connection.getDBConnection();
+			stmt = con.prepareStatement(query);
+			stmt.setLong(1, clusterID);
+			results = stmt.executeQuery();
+			if(results.next()){
+				String[] service = results.getString(1).split(",");
+				for(String s: service)
+					services += s + ",";
+				services = services.substring(0, services.length()-1);
+			}
+			System.out.println(services);
+		}catch (SQLException e){
+			e.printStackTrace();
+		}finally {
+			connection.close(stmt);
+			connection.close(results);
+			connection.close(con);
+		}
+		return services;
 	}
 }

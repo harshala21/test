@@ -10,9 +10,10 @@ public class ServicePair {
 	private double ratingSimilarity;
 	private double enhancedRatingSimilarity;
 	
-	public ServicePair(long unRatedServiceID, long otherServiceID) {
+	public ServicePair(long unRatedServiceID, long otherServiceID,long clusterID) {
 		setOtherServiceID(otherServiceID);
 		setUnRatedServiceID(unRatedServiceID);
+		setClusterID(clusterID);
 	}
 	public long getClusterID() {
 		return clusterID;

@@ -70,12 +70,12 @@ public class Main {
 				 	
 				 break;
 			 case 2:
-				 System.out.println("Choosen Flitering");
+				 	System.out.println("Choosen Flitering");
 				 	Rating rating = new Rating();
 				 	int activeUserID = printAndAcceptUser(sc);
 					//rating.diplayRatingMatrix();
 					System.out.println();
-					ArrayList<Long> unRatedServices = Rating.dao.findUnratedServices(0);
+					ArrayList<Long> unRatedServices = Rating.dao.findUnratedServices(0,activeUserID);
 					HashMap<Long,ArrayList<ServicePair>> servicePairs = new HashMap<Long,ArrayList<ServicePair>>();
 					for(long id : unRatedServices){
 						long clusterID = rating.findClusters(id);
@@ -124,8 +124,7 @@ public class Main {
 		}catch(Exception e){
 			 System.out.println("Input should be only be Integers and !\n Halting System ");
 		 }
-		
-		return 0;	
+		return input;	
 	}
 
 	private static int printMenu(Scanner sc) {

@@ -21,7 +21,7 @@ public static ServiceDAO dao = new ServiceDAO();
 	
 
 public static void main(String[] args) {
-		
+		dao.getClusterServices(2);
 	} 	
 	
 	public void calculateRatingSimialrity(HashMap<Long, ArrayList<ServicePair>> servicePairs) {
@@ -42,7 +42,7 @@ public static void main(String[] args) {
 		for(ServicePair pair : pairList){
 			meanUnRated = getMean(dao.getSimlarityRatings(pair.getUnRatedServiceID()));
 			meanOther = getMean(dao.getSimlarityRatings(pair.getOtherServiceID()));
-			pair.setRatingSimilarity(calculateRatingSimilarity(dao.getSimlarityRatings(pair.getUnRatedServiceID()), dao.getSimlarityRatings(pair.getOtherServiceID()), meanUnRated, meanOther));
+			pair.setRatingSimilarity(calculateRatingSimilarity(dao.getSimlarityRatingsWithOutZero(pair.getUnRatedServiceID(),pair.getClusterID()), dao.getSimlarityRatingsWithOutZero(pair.getOtherServiceID(),pair.getClusterID()), meanUnRated, meanOther));
 			pair.setEnhancedRatingSimilarity(calculateEnhancedRatingSimilarity(pair.getRatingSimilarity(),dao.getNonZeroRatingSize(pair.getUnRatedServiceID()),dao.getNonZeroRatingSize(pair.getOtherServiceID()),dao.getPairIntesection(pair)));
 		}
 	}
@@ -67,7 +67,7 @@ public static void main(String[] args) {
 				if(id == Long.parseLong(serviceID))
 					continue;
 				else{
-					servicePair.add(new ServicePair(id,Long.parseLong(serviceID)));
+					servicePair.add(new ServicePair(id,Long.parseLong(serviceID),clusterID));
 				}
 			}
 			
