@@ -1,5 +1,7 @@
 package clubcf.model;
 
+import clubcf.dao.service.ServiceDAO;
+
 public class ServicePair {
 	private long clusterID;
 	private long unRatedServiceID;
@@ -14,6 +16,16 @@ public class ServicePair {
 		setOtherServiceID(otherServiceID);
 		setUnRatedServiceID(unRatedServiceID);
 		setClusterID(clusterID);
+		setServiceName(getUnRatedServiceID(),false);
+		setServiceName(getOtherServiceID(),true);
+	}
+	private void setServiceName(long id, boolean other) {
+		ServiceDAO dao = new ServiceDAO();
+		if(other)
+			setOtherServiceName(dao.getServiceName(id));
+		else
+			setUnRatedServiceName(dao.getServiceName(id));
+		
 	}
 	public long getClusterID() {
 		return clusterID;

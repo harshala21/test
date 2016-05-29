@@ -94,6 +94,9 @@ public class Main {
 							System.out.println(pair.getRatingSimilarity()+"\t"+pair.getEnhancedRatingSimilarity());
 						}
 					}
+					
+					System.out.print("\nPlease provide Rating similarity Threshhold value:");
+					rating.getNeigbhours(sc.nextDouble(),servicePairs,activeUserID);
 				 break;
 			 case 3:
 				 System.out.println("Choosen Recommendation");

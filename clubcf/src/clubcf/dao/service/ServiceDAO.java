@@ -62,9 +62,25 @@ public class ServiceDAO implements DAO {
 		return unRatedServices.size() > 0 ? unRatedServices : null;
 	}
 	
-	public Services getServiceDetails(long serviceID){
-		String serviceSQL = "select sid from sample_data where id = ?";
-		return null;
+	public String getServiceName(long serviceID){
+		String serviceName = null;
+		try{
+			String query = "select sid from sample_data where id = ?";
+			con = openConnection();
+			stmt = con.prepareStatement(query);
+			stmt.setLong(1, serviceID);
+			results = stmt.executeQuery();
+			if(results.next()){
+				serviceName = results.getString(1);
+			}
+		}catch (SQLException w){
+			w.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		return serviceName;
 	}
 
 	public double[] getMeanRatings(long serviceID) {
@@ -109,7 +125,6 @@ public class ServiceDAO implements DAO {
 			close(results);
 			close(con);
 		}
-		
 		return convertToArray(dataDB);
 	}
 	
@@ -118,7 +133,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 		ArrayList<Double> dataDB = new ArrayList<Double>();
 		try{
 			String query = "select ratings from rating_matrix where service_id ="+serviceID+" and user_id not in  (select user_id from rating_matrix where service_id in ("+getClusterServices(clusterID)+")  and ratings = 0)";
-			System.out.println(query);
+			//System.out.println(query);
 			con = openConnection();
 			Statement stmt = con.createStatement();			
 			results = stmt.executeQuery(query);
@@ -225,7 +240,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 					services += s + ",";
 				services = services.substring(0, services.length()-1);
 			}
-			System.out.println(services);
+			//System.out.println(services);
 		}catch (SQLException e){
 			e.printStackTrace();
 		}finally {
@@ -235,4 +250,70 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 		}
 		return services;
 	}
+
+	public String getClusterName(long id) {
+		String clusterName = null;
+		try{
+			String query = "select cluster_name from clusters where cluster_id = ?";
+			con = openConnection();
+			stmt = con.prepareStatement(query);
+			stmt.setLong(1, id);
+			results = stmt.executeQuery();
+			if(results.next()){
+				clusterName = results.getString(1);
+			}
+		}catch (SQLException w){
+			w.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		return clusterName;
+		
+	}
+	
+	public double getMean(long unRatedServiceID) {
+		double mean = 0;
+		try{
+			String query = "select avg(ratings) from rating_matrix where service_id = ?";
+			con = openConnection();
+			stmt = con.prepareStatement(query);
+			stmt.setLong(1, unRatedServiceID);
+			results = stmt.executeQuery();
+			if(results.next()){
+				mean =  results.getDouble(1);
+			}
+		}catch (SQLException w){
+			w.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		return mean;
+	}
+
+	public double getRating(long serviceID, long activeUserID) {
+		double rating = 0;
+		try{
+			String query = "select ratings from rating_matrix where service_id = ? and user_id = ?";
+			con = openConnection();
+			stmt = con.prepareStatement(query);
+			stmt.setLong(1, serviceID);
+			stmt.setLong(2, activeUserID);
+			results = stmt.executeQuery();
+			if(results.next()){
+				rating =  results.getDouble(1);
+			}
+		}catch (SQLException w){
+			w.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		return rating;
+	}	
+	
 }

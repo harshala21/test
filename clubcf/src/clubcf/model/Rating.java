@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import clubcf.dao.service.ServiceDAO;
@@ -195,5 +196,40 @@ public static void main(String[] args) {
 		mean = sum/service.length;
 		return mean;
 	}
+
+	public void getNeigbhours(double threshHold, HashMap<Long, ArrayList<ServicePair>> servicePairs,long activeUserID) {
+		ArrayList<ServicePair> neighbours = new ArrayList<ServicePair>();
+		Iterator<Long> itr = servicePairs.keySet().iterator();
+		while(itr.hasNext()){
+			boolean unrated = true;
+			String neighbourName = "";
+			long clusterID = itr.next();
+			System.out.println("For Cluster:"+dao.getClusterName(clusterID));
+			ArrayList<ServicePair> pairs = servicePairs.get(clusterID);
+			for(ServicePair pair : pairs){
+				if(pair.getEnhancedRatingSimilarity() >= threshHold || pair.getRatingSimilarity() >= threshHold){
+					if(unrated){
+						System.out.print("Neighbours for "+pair.getUnRatedServiceName()+" are ");
+						unrated = false;
+					}
+					neighbours.add(pair);
+					neighbourName += pair.getOtherServiceName()+",";
+				}
+			}
+			System.out.println(neighbourName.substring(0,neighbourName.length()-1)+"\n");
+			calculatePredictedRatings(neighbours,activeUserID);
+		}
+	}
+	
+	public void calculatePredictedRatings(List<ServicePair> neighbours,long activeUserID){
+		double unRatedMean = dao.getMean(neighbours.get(0).getUnRatedServiceID());
+		double numerator = 0, denominator = 0;
+		for(ServicePair pair : neighbours){
+			numerator += (dao.getRating(pair.getOtherServiceID(),activeUserID) - dao.getMean(pair.getOtherServiceID()))* pair.getEnhancedRatingSimilarity();
+			denominator += pair.getEnhancedRatingSimilarity();
+		}
+		System.out.println("predicted rating for "+neighbours.get(0).getUnRatedServiceName()+": "+(unRatedMean + (numerator/denominator)));
+	}
+
 	
 }
