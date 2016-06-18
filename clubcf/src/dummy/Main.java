@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+import org.omg.PortableServer.ServantRetentionPolicyValue;
+
 import clubcf.algo.Stemmer;
 import clubcf.dao.UserDAO;
 import clubcf.dao.service.ServiceDAO;
@@ -111,6 +113,12 @@ public class Main {
 				 }				
 				 break;
 			 case 4:
+				 System.out.println("MAE Factor: Experimental Evaluation");
+				 double mea= 0;
+				 for(Services service : Main.predictedRatings){
+					mea += service.getPredictedRatingDifference();
+				 }
+				 System.out.println("MEA: "+mea/Main.predictedRatings.size());
 				 break;
 			 case 0:
 				 break;
