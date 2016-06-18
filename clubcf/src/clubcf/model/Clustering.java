@@ -69,10 +69,14 @@ public class Clustering {
 	}
 	
 	public void reductionStep(List<Cluster> similarityMatrix,int row,int index ){
+		try{
 		String columnService = similarityMatrix.get(index).getName(); 
 		computeColumn(similarityMatrix,row,index);
 		removeRow(similarityMatrix,index);
 		similarityMatrix.get(row).setName(similarityMatrix.get(row).getName()+","+columnService);
+		}catch(Exception e ){
+			//eat it
+		}
 	}
 
 	private void computeColumn(List<Cluster> similarityMatrix, int row, int column){
@@ -89,9 +93,10 @@ public class Clustering {
 				Main.getMax(similarityValues, index);
 			}
 		}catch(IndexOutOfBoundsException e){
-			System.out.println("index:\t"+index+"\n Row:\t"+row+"\nColumn:\t"+column);
+			/*System.out.println("index:\t"+index+"\n Row:\t"+row+"\nColumn:\t"+column);
 			System.out.println("matrix:\t"+similarityMatrix.size()+"\n Values:\t"+similarityValues.size());
-			e.printStackTrace();
+			e.printStackTrace();*/
+			//eat it.
 		}
 	}
 

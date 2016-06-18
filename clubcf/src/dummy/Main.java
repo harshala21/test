@@ -1,5 +1,7 @@
 package dummy;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +24,9 @@ public class Main {
 	static double maxValue = 0d;
 	static int index =-1;
 	static boolean isWordNet = false;
+	public static ArrayList<Services> predictedRatings = new ArrayList<Services>(); 
+	static long activeuser = 0;
+	 public static long activeService = 0; 
 
 	public static void main(String[] args){
 		System.out.println("Club CF");
@@ -73,33 +78,39 @@ public class Main {
 				 	System.out.println("Choosen Flitering");
 				 	Rating rating = new Rating();
 				 	int activeUserID = printAndAcceptUser(sc);
+				 	Main.activeuser = activeUserID;
 					//rating.diplayRatingMatrix();
 					System.out.println();
 					ArrayList<Long> unRatedServices = Rating.dao.findUnratedServices(0,activeUserID);
-					HashMap<Long,ArrayList<ServicePair>> servicePairs = new HashMap<Long,ArrayList<ServicePair>>();
-					for(long id : unRatedServices){
-						long clusterID = rating.findClusters(id);
-						if(rating.getClusterSize(clusterID) == 1){
-							continue;
-						}
-						servicePairs.put(id, rating.createServiceGroups(id,clusterID));
-					}
-					rating.calculateRatingSimialrity(servicePairs);
-					Iterator< Long> itr = servicePairs.keySet().iterator();
-					System.out.println("Rating Matrix");
-					while(itr.hasNext()){
-						ArrayList<ServicePair> pairs = servicePairs.get(itr.next());
-						for(ServicePair pair : pairs){
-							System.out.print("("+pair.getUnRatedServiceID()+","+pair.getOtherServiceID()+")\t");
-							System.out.println(pair.getRatingSimilarity()+"\t"+pair.getEnhancedRatingSimilarity());
-						}
-					}
-					
+					HashMap<Long,ArrayList<ServicePair>> servicePairs = rating.calculateAndPrint(unRatedServices,true,false,0);
 					System.out.print("\nPlease provide Rating similarity Threshhold value:");
-					rating.getNeigbhours(sc.nextDouble(),servicePairs,activeUserID);
+					rating.getNeigbhours(sc.nextDouble(),servicePairs,activeUserID,true);
 				 break;
 			 case 3:
-				 System.out.println("Choosen Recommendation");
+				 if(Main.predictedRatings.isEmpty())
+					 System.out.println("Please other actions before this.");
+				 else {
+					 ServiceDAO dao = new ServiceDAO();
+					 System.out.println("Recommendation for "+dao.getServiceName(Main.activeService)+ " are (Acending order):");
+					 Comparator<Services> comparator = new Comparator<Services>() {	
+						    public int compare(Services a, Services b) {
+						        if(a.getPredictedRatingDifference() > b.getPredictedRatingDifference())
+						        	return 1;
+						        else if ( a.getPredictedRatingDifference() < b.getPredictedRatingDifference())
+						        	return -1;
+						        else 
+						        	return 0;
+						    }
+						};
+					Collections.sort(Main.predictedRatings,comparator);
+					int i =1;
+					for(Services service : Main.predictedRatings){
+						System.out.println(i+" : "+service.getApiName());
+						i++;
+					}
+				 }				
+				 break;
+			 case 4:
 				 break;
 			 case 0:
 				 break;
@@ -132,7 +143,7 @@ public class Main {
 
 	private static int printMenu(Scanner sc) {
 		try{
-			System.out.println("0. Exit\n1. Phase I Clustering\n2. Flitering\n3. Recommendation\n4. Result");
+			System.out.println("\n\n\t\tMain Menu\n0. Exit\n1. Phase I Clustering\n2. Flitering\n3. Recommendation\n4. Result");
 			System.out.print("Your Choice: ");
 			return sc.nextInt();
 		 }catch(Exception e){

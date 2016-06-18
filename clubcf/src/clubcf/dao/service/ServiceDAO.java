@@ -314,6 +314,31 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 			close(con);
 		}
 		return rating;
-	}	
+	}
+
+
+	public String getAPIName(long serviceID) {
+		String rating = null;
+		try{
+			String query = "select api from sample_data where id = ?";
+			con = openConnection();
+			stmt = con.prepareStatement(query);
+			stmt.setLong(1, serviceID);
+			
+			results = stmt.executeQuery();
+			if(results.next()){
+				rating =  results.getString(1);
+			}
+		}catch (SQLException w){
+			w.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		return rating;
+	}
+
+	
 	
 }

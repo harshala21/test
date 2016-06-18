@@ -3,6 +3,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,6 +13,7 @@ import java.util.Map;
 
 import clubcf.dao.service.ServiceDAO;
 import clubcf.factory.DBConnection;
+import dummy.Main;
 
 
 public class Rating {
@@ -197,30 +200,43 @@ public static void main(String[] args) {
 		return mean;
 	}
 
-	public void getNeigbhours(double threshHold, HashMap<Long, ArrayList<ServicePair>> servicePairs,long activeUserID) {
+	public void getNeigbhours(double threshHold, HashMap<Long, ArrayList<ServicePair>> servicePairs,long activeUserID,boolean neighbour) {
 		ArrayList<ServicePair> neighbours = new ArrayList<ServicePair>();
 		Iterator<Long> itr = servicePairs.keySet().iterator();
 		while(itr.hasNext()){
 			boolean unrated = true;
 			String neighbourName = "";
 			long clusterID = itr.next();
-			System.out.println("For Cluster:"+dao.getClusterName(clusterID));
+			if(neighbour)
+				System.out.println("For Cluster:"+dao.getClusterName(clusterID));
 			ArrayList<ServicePair> pairs = servicePairs.get(clusterID);
 			for(ServicePair pair : pairs){
 				if(pair.getEnhancedRatingSimilarity() >= threshHold || pair.getRatingSimilarity() >= threshHold){
 					if(unrated){
-						System.out.print("Neighbours for "+pair.getUnRatedServiceName()+" are ");
+						if(neighbour)
+							System.out.print("Neighbours for "+pair.getUnRatedServiceName()+" are ");
 						unrated = false;
 					}
 					neighbours.add(pair);
 					neighbourName += pair.getOtherServiceName()+",";
 				}
 			}
-			System.out.println(neighbourName.substring(0,neighbourName.length()-1)+"\n");
+			if(neighbour)
+				System.out.println(neighbourName.substring(0,neighbourName.length()-1)+"\n");
 			calculatePredictedRatings(neighbours,activeUserID);
+			if(neighbour)
+				calculateNeighbourPredictedRatings(neighbours, activeUserID,threshHold);
 		}
 	}
 	
+	private void calculateNeighbourPredictedRatings(ArrayList<ServicePair> neighbours, long activeUserID, double threshHold) {
+		Main.activeService = neighbours.get(0).getUnRatedServiceID();
+		Main.predictedRatings.clear();
+		for(ServicePair pair : neighbours){
+			getNeigbhours(threshHold,calculateAndPrint(null, false, true, pair.getOtherServiceID()),activeUserID,false);
+		}
+	}
+
 	public void calculatePredictedRatings(List<ServicePair> neighbours,long activeUserID){
 		double unRatedMean = dao.getMean(neighbours.get(0).getUnRatedServiceID());
 		double numerator = 0, denominator = 0;
@@ -228,8 +244,42 @@ public static void main(String[] args) {
 			numerator += (dao.getRating(pair.getOtherServiceID(),activeUserID) - dao.getMean(pair.getOtherServiceID()))* pair.getEnhancedRatingSimilarity();
 			denominator += pair.getEnhancedRatingSimilarity();
 		}
-		System.out.println("predicted rating for "+neighbours.get(0).getUnRatedServiceName()+": "+(unRatedMean + (numerator/denominator)));
+		DecimalFormat nf = new DecimalFormat("#.##");
+		double rating = (unRatedMean + (numerator/denominator));
+		Main.predictedRatings.add(new Services(neighbours.get(0).getUnRatedServiceID(),neighbours.get(0).getUnRatedServiceName(),
+				Math.abs(dao.getRating(neighbours.get(0).getUnRatedServiceID(), activeUserID)- rating),
+				dao.getAPIName(neighbours.get(0).getUnRatedServiceID())));
+		System.out.println("predicted rating for "+neighbours.get(0).getUnRatedServiceName()+": "+nf.format(rating));
+	}
+	
+	public void print(HashMap<Long, ArrayList<ServicePair>> servicePairs) {
+		Iterator< Long> itr = servicePairs.keySet().iterator();
+		System.out.println("Rating Matrix");
+		while(itr.hasNext()){
+			ArrayList<ServicePair> pairs = servicePairs.get(itr.next());
+			for(ServicePair pair : pairs){
+				System.out.print("("+pair.getUnRatedServiceID()+","+pair.getOtherServiceID()+")\t");
+				System.out.println(pair.getRatingSimilarity()+"\t"+pair.getEnhancedRatingSimilarity());
+			}
+		}
 	}
 
-	
+	public HashMap<Long, ArrayList<ServicePair>> calculateAndPrint(ArrayList<Long> unRatedServices,boolean print, boolean singleMode,long serviceID) {
+		HashMap<Long,ArrayList<ServicePair>> servicePairs = new HashMap<Long,ArrayList<ServicePair>>();
+		if(!singleMode){
+			for(long id : unRatedServices){
+				long clusterID = findClusters(id);
+				if(getClusterSize(clusterID) == 1){
+					continue;
+				}
+				servicePairs.put(id, createServiceGroups(id,clusterID));
+			}
+		}else{
+			servicePairs.put(serviceID, createServiceGroups(serviceID,findClusters(serviceID)));
+		}
+		calculateRatingSimialrity(servicePairs);
+		if(print)
+			print(servicePairs);
+		return servicePairs;
+	}
 }

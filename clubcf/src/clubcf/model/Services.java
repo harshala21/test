@@ -1,4 +1,7 @@
 package clubcf.model;
+
+import clubcf.dao.service.ServiceDAO;
+
 public class Services {
 
 	private long serviceID;
@@ -6,6 +9,7 @@ public class Services {
 	private String stemWord;
 	private String apiName;
 	private String symanticStemWords;
+	private double predictedRatingDifference;
 	
 	
 	public String getSymanticStemWords() {
@@ -26,6 +30,16 @@ public class Services {
 
 	public String getApiName() {
 		return apiName;
+	}
+	
+	public Services(){
+		
+	}
+	public Services(long serviceID,String serviceName,double predictedRatingDifference,String apiName){
+		setServiceID(serviceID);
+		setServiceName(serviceName);
+		setPredictedRatingDifference(predictedRatingDifference);
+		setApiName(apiName);
 	}
 
 	public Services(long serviceID, String serviceName, String stemWord, String apiName) {
@@ -53,6 +67,14 @@ public class Services {
 
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
+	}
+
+	public double getPredictedRatingDifference() {
+		return predictedRatingDifference;
+	}
+
+	public void setPredictedRatingDifference(double predictedRatingDifference) {
+		this.predictedRatingDifference = predictedRatingDifference;
 	}
 
 }
