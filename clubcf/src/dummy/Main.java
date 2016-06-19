@@ -1,4 +1,7 @@
 package dummy;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -6,8 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
-
-import org.omg.PortableServer.ServantRetentionPolicyValue;
 
 import clubcf.algo.Stemmer;
 import clubcf.dao.UserDAO;
@@ -19,9 +20,23 @@ import clubcf.model.Clustering;
 import clubcf.model.Rating;
 import clubcf.model.ServicePair;
 import clubcf.model.Services;
+import net.didion.jwnl.JWNL;
+import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.dictionary.Dictionary;
 
 public class Main {
 
+	
+	/*static {
+		try {
+			JWNL.initialize(new FileInputStream(new File("C:\\Users\\Arvind\\git\\test\\clubcf\\Wordnet\\jwnl14-rc2\\config\\file_properties.xml")));
+			Dictionary.getInstance() ;
+		} catch (FileNotFoundException | JWNLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
+	static Dictionary dict;*/
 	static int row = -1;
 	static double maxValue = 0d;
 	static int index =-1;
@@ -29,7 +44,17 @@ public class Main {
 	public static ArrayList<Services> predictedRatings = new ArrayList<Services>(); 
 	static long activeuser = 0;
 	 public static long activeService = 0; 
-
+	/* public static void main(String[] args){
+		 Scanner sc = new Scanner(System.in);
+		 System.out.print("Please enter any word: ");
+		 try {
+			Main.dict.lookupAllIndexWords(sc.next());
+		} catch (JWNLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	 }*/
+	 
 	public static void main(String[] args){
 		System.out.println("Club CF");
 		Scanner sc = new Scanner(System.in);
