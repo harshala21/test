@@ -1,4 +1,7 @@
 package dummy;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,33 +13,28 @@ import clubcf.factory.DBConnection;
 import clubcf.model.ClubCF;
 import clubcf.model.Cluster;
 import clubcf.model.Services;
-import edu.smu.tspell.wordnet.NounSynset;
-import edu.smu.tspell.wordnet.Synset;
-import edu.smu.tspell.wordnet.SynsetType;
-import edu.smu.tspell.wordnet.WordNetDatabase;
+import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.data.IndexWord;
+import net.didion.jwnl.data.IndexWordSet;
+import net.didion.jwnl.data.PointerUtils;
+import net.didion.jwnl.data.Synset;
+import net.didion.jwnl.data.Word;
+import net.didion.jwnl.data.list.PointerTargetTree;
+import net.didion.jwnl.data.list.PointerTargetTreeNode;
 import net.didion.jwnl.dictionary.Dictionary;
 
 public class Main {
-	static NounSynset nounSynset; 
-	static NounSynset[] hyponyms; 
-	
+
 	
 	static {
-		System.setProperty("wordnet.database.dir", "C:\\Users\\Arvind\\git\\test\\clubcf\\Wordnet\\dict");
-			WordNetDatabase database = WordNetDatabase.getFileInstance(); 
-			Synset[] synsets = database.getSynsets("drive", SynsetType.NOUN); 
-			for (int i = 0; i < synsets.length; i++) { 
-			    nounSynset = (NounSynset)(synsets[i]);
-			    
-			    hyponyms = nounSynset.getHyponyms(); 
-			    for(NounSynset s : hyponyms){
-			    	System.out.println(s);
-			    }
-			    System.out.println(nounSynset.getWordForms()[0] + 
-			            ": " + nounSynset.getDefinition() + ") has " + hyponyms.length + " hyponyms"); 
-			}
-		
+		try {
+			JWNL.initialize(new FileInputStream(new File("C:\\Users\\Arvind\\git\\test\\clubcf\\Wordnet\\jwnl14-rc2\\config\\file_properties.xml")));
+			Main.dict = Dictionary.getInstance() ;
+		} catch (FileNotFoundException | JWNLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 	static Dictionary dict;
 	static int row = -1;
@@ -47,11 +45,30 @@ public class Main {
 	static long activeuser = 0;
 	public static long activeService = 0; 
 	
+	private static void demonstrateTreeOperation(IndexWord word) throws JWNLException {
+		// Get all the hyponyms (children) of the first sense of <var>word</var>
+		PointerTargetTree hyponyms = PointerUtils.getInstance().getHyponymTree(word.getSense(1));
+		System.out.println("Hyponyms of \"" + word.getLemma() + "\":");
+	
+		Iterator<PointerTargetTreeNode> itr = hyponyms.getRootNode().getChildTreeList().iterator();
+		while(itr.hasNext()){
+			PointerTargetTreeNode node = itr.next();
+			Synset s = node.getSynset();
+			for (Word ss :s.getWords()){
+				System.out.println(ss.getLemma());
+			}
+		}
+	}
+	
 	 public static void main(String[] args){
 		 Scanner sc = new Scanner(System.in);
 		 System.out.print("Please enter any word: ");
 		 try {
-			Main.dict.lookupAllIndexWords(sc.next());
+			 IndexWordSet synonyms = Main.dict.lookupAllIndexWords(sc.next());
+			 for(IndexWord s : synonyms.getIndexWordArray()){
+				 System.out.println(s.getLemma());
+				 demonstrateTreeOperation(s);
+			 }
 		} catch (JWNLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
