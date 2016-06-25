@@ -23,7 +23,20 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  * Created by vinit on 5/22/15.
  */
 public class ReadExcelData {
-	private static final String FILE_PATH = "SampleData1.xls";
+	private String FILE_PATH = "SampleData1.xls";
+
+	public String getFILE_PATH() {
+		return FILE_PATH;
+	}
+	public void setFILE_PATH(String fILE_PATH) {
+		FILE_PATH = fILE_PATH;
+	}
+	public ReadExcelData(){
+		
+	}
+	public ReadExcelData(String path) {
+		this.setFILE_PATH(path);
+	}
 
 	public List getListFromExcel() throws Exception {
 		List<ClubCF> clubCFList = new ArrayList<ClubCF>();

@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import clubcf.dao.DAO;
@@ -339,6 +341,39 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 		return rating;
 	}
 
-	
-	
+	public void updateSemanticWordToDB(HashSet<String> semanticWords, long serviceID) {
+		String semantics = prepareSemantics(semanticWords);
+		try{
+			String cleanUpQuery = "update sample_data set semantics = null where id = ?";
+			String query = "update sample_data set semantics = ? where id =? ";
+			con = openConnection();
+			stmt = con.prepareStatement(cleanUpQuery);
+			stmt.setLong(1, serviceID);
+			stmt.executeUpdate();
+			stmt = con.prepareStatement(query);
+			stmt.setString(1, semantics);
+			stmt.setLong(2, serviceID);
+			
+			stmt.executeUpdate();
+			
+		}catch (SQLException w){
+			System.out.println(semantics.length());
+			System.out.println(semantics);
+			w.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+			semanticWords.clear();
+		}
+	}
+
+	private String prepareSemantics(HashSet<String> semanticWords) {
+		String semantics= "";
+		Iterator<String> itr = semanticWords.iterator();
+		while (itr.hasNext())
+			semantics += itr.next()+",";
+		return semantics.isEmpty() ? "" : semantics.substring(0, semantics.length()-1);
+	}
+
 }

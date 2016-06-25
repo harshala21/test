@@ -3,15 +3,27 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+
+import javax.sql.rowset.serial.SerialArray;
 
 import clubcf.algo.Stemmer;
 import clubcf.dao.UserDAO;
+import clubcf.dao.service.ServiceDAO;
 import clubcf.factory.DBConnection;
 import clubcf.model.ClubCF;
 import clubcf.model.Cluster;
+import clubcf.model.Clustering;
+import clubcf.model.Rating;
+import clubcf.model.ServicePair;
 import clubcf.model.Services;
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
@@ -36,6 +48,8 @@ public class Main {
 			e.printStackTrace();
 		} 
 	}
+	
+	static int limit = 50;
 	static Dictionary dict;
 	static int row = -1;
 	static double maxValue = 0d;
@@ -45,37 +59,28 @@ public class Main {
 	static long activeuser = 0;
 	public static long activeService = 0; 
 	
-	private static void demonstrateTreeOperation(IndexWord word) throws JWNLException {
+	private static void demonstrateTreeOperation(IndexWord word, HashSet<String> semanticWords) throws JWNLException {
 		// Get all the hyponyms (children) of the first sense of <var>word</var>
 		PointerTargetTree hyponyms = PointerUtils.getInstance().getHyponymTree(word.getSense(1));
-		System.out.println("Hyponyms of \"" + word.getLemma() + "\":");
+		//System.out.println("Hyponyms of \"" + word.getLemma() + "\":");
 	
 		Iterator<PointerTargetTreeNode> itr = hyponyms.getRootNode().getChildTreeList().iterator();
 		while(itr.hasNext()){
 			PointerTargetTreeNode node = itr.next();
 			Synset s = node.getSynset();
 			for (Word ss :s.getWords()){
-				System.out.println(ss.getLemma());
+				semanticWords.add(ss.getLemma());
 			}
 		}
 	}
 	
-	 public static void main(String[] args){
+	 /*public static void main(String[] args){
 		 Scanner sc = new Scanner(System.in);
 		 System.out.print("Please enter any word: ");
-		 try {
-			 IndexWordSet synonyms = Main.dict.lookupAllIndexWords(sc.next());
-			 for(IndexWord s : synonyms.getIndexWordArray()){
-				 System.out.println(s.getLemma());
-				 demonstrateTreeOperation(s);
-			 }
-		} catch (JWNLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		 
 	 }
-	 
-	/*public static void main(String[] args){
+	 */
+	public static void main(String[] args){
 		System.out.println("Club CF");
 		Scanner sc = new Scanner(System.in);
 		 int choice = -1;
@@ -87,8 +92,36 @@ public class Main {
 				 	int innerChoice = printClusteringMenu(sc);
 				 	switch(innerChoice){
 				 	case 0:
-				 		System.out.println("Not Implemented");
 				 		break;
+				 	case 2:
+				 		try {
+				 			ServiceDAO dao = new ServiceDAO();
+				 			List<Services> allServices = dao.getAllDetails(1000);
+				 			System.out.println("Performing Symantic Analysis for service: ");
+				 			int serviceCount =1;
+				 			HashSet<String> semanticWords = new HashSet<String>();
+				 			for(Services service : allServices){
+				 				System.out.println(serviceCount+". "+ service.getServiceName());
+				 				String[] stemWords = service.getStemWord().split(",");
+				 				for(String st: stemWords )
+				 					System.out.println(st);
+				 				for(String stem : stemWords){
+				 					IndexWordSet synonyms = Main.dict.lookupAllIndexWords(stem);
+				 					for(IndexWord s : synonyms.getIndexWordArray()){
+										 //System.out.println(s.getLemma());
+										 demonstrateTreeOperation(s,semanticWords);
+									 }
+				 				}
+				 				System.out.println(semanticWords.size());
+				 				dao.updateSemanticWordToDB(semanticWords,service.getServiceID());
+				 				serviceCount++;
+				 			}
+							 //IndexWordSet synonyms = Main.dict.lookupAllIndexWords(sc.next());
+						} catch (JWNLException e) {
+							// TODO Auto-generated catch block	
+							e.printStackTrace();
+						}
+				 		isWordNet = true;
 				 	case 1:
 				 		ServiceDAO dao = new ServiceDAO();
 						List<Cluster> similarityMatrix = new ArrayList<Cluster>();
@@ -115,11 +148,7 @@ public class Main {
 							sc.next();
 						}
 						break;
-				 	case 3:
-				 		System.out.println("Not Implemented");
-				 		break;
 				 	}
-				 	
 				 break;
 			 case 2:
 				 	System.out.println("Choosen Flitering");
@@ -165,6 +194,59 @@ public class Main {
 				 }
 				 System.out.println("MEA: "+mea/Main.predictedRatings.size());
 				 break;
+			 case 5: 
+				try {
+					System.out.println("Please povide path to the Excel File (2003 Format)");
+					String path = sc.next();
+					readExcelAndAddInToDB(path);
+					DBConnection connection = new DBConnection();
+					List<ClubCF> dbList = connection.getDBRecords(Main.limit);
+					float alpha = (float) 0.5;
+					String outPut = "";
+					
+					float matrix[][] = new float[Main.limit][Main.limit];
+					
+					for (int i = 0; i < dbList.size(); i++) {
+						ClubCF t1 = (ClubCF) dbList.get(i);
+						List<String> list1 = new ArrayList<String>(Arrays.asList(t1
+								.getStemWord().split(",")));
+						List<String> list3 = new ArrayList<String>(Arrays.asList(t1
+								.getApis().split(",")));
+						
+						for (int j = 0; j < dbList.size(); j++) {
+							outPut += "'";
+							ClubCF t2 = (ClubCF) dbList.get(j);
+							List<String> list2 = new ArrayList<String>(Arrays.asList(t2
+									.getStemWord().split(",")));
+							List<String> list4 = new ArrayList<String>(Arrays.asList(t2
+									.getApis().split(",")));
+
+							float D_sim = new Main().intersection(list1, list2)
+									/ new Main().union(list1, list2);
+							float F_sim = new Main().intersection(list3, list4)
+									/ new Main().union(list3, list4);
+
+							float C_Sim = (float) (alpha * D_sim + (1 - alpha) * F_sim);
+
+							String output = String.format("%.3f", C_Sim);
+
+							//System.out.print(" " + output + " ");
+							
+							matrix[i][j] = C_Sim;
+							
+							outPut += output + "'";
+							if ((j + 1) < dbList.size()) {
+								outPut += ",";
+							}
+						}
+						// connection.insertInAverageDB(outPut);
+						//System.out.print("\n");
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				 break;
 			 case 0:
 				 break;
 			 default:
@@ -173,7 +255,7 @@ public class Main {
 			 }
 		 }while(choice != 0);
 		 sc.close();
-	}*/
+	}
 	
 	private static int printAndAcceptUser(Scanner sc) {
 		int count = new UserDAO().getUsersCount();
@@ -196,7 +278,7 @@ public class Main {
 
 	private static int printMenu(Scanner sc) {
 		try{
-			System.out.println("\n\n\t\tMain Menu\n0. Exit\n1. Phase I Clustering\n2. Flitering\n3. Recommendation\n4. Result");
+			System.out.println("\n\n\t\tMain Menu\n0. Exit\n1. Phase I Clustering\n2. Flitering\n3. Recommendation\n4. Result\n5. Update Data");
 			System.out.print("Your Choice: ");
 			return sc.nextInt();
 		 }catch(Exception e){
@@ -248,8 +330,8 @@ public class Main {
 		System.out.println("Max Value: "+Main.maxValue+"\nPresent At ("+Main.row+","+Main.index+") and ("+Main.index+","+Main.row+")");
 	}
 	
-	public static void readExcelAndAddInToDB() throws Exception {
-		ReadExcelData readExcelData = new ReadExcelData();
+	public static void readExcelAndAddInToDB(String path) throws Exception {
+		ReadExcelData readExcelData = new ReadExcelData(path);
 		List list = readExcelData.getListFromExcel();
 		Iterator iterator = list.iterator();
 		int counter = 0;
@@ -290,5 +372,28 @@ public class Main {
 		DBConnection connection = new DBConnection();
 		connection.insertInDB(clubCF, stemword);
 		return stemword;
+	}
+	
+
+	
+	public float union(List list1, List list2) {	
+		Set set = new HashSet();
+
+		set.addAll(list1);
+		set.addAll(list2);
+
+		return set.size();
+	}
+
+	public float intersection(List list1, List list2) {
+		List list = new ArrayList();
+
+		for (String t : (ArrayList<String>) list1) {
+			if (list2.contains(t)) {
+				list.add(t);
+			}
+		}
+
+		return list.size();
 	}
 }

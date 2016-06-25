@@ -30,7 +30,6 @@ public class DBConnection {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return conn;
 	}
 	
@@ -67,6 +66,8 @@ public class DBConnection {
 		try {
 			conn = getDBConnection();
 			stmt = conn.createStatement();
+			String deleteSQL = "delete from "+mashupService;
+			stmt.execute(deleteSQL);
 			String sql = "SELECT * FROM " + mashupService + " limit " + limit;
 			rs = stmt.executeQuery(sql);
 			int counter = 0;

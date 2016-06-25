@@ -42,9 +42,10 @@ public class Services {
 		setApiName(apiName);
 	}
 
-	public Services(long serviceID, String serviceName, String stemWord, String apiName) {
+	public Services(long serviceID, String serviceName, String apiName,String stemWord) {
 		this.serviceID = serviceID;
 		this.serviceName = serviceName;
+		System.out.println("serive "+serviceName+" "+stemWord);
 		this.stemWord = stemWord;
 		this.apiName = apiName;
 	}
