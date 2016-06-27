@@ -42,6 +42,10 @@ public class Clustering {
 	private double calculateDescriptionSimilarity(Services serviceX, Services serviceY,boolean isWordNet){
 		List<String> stemWordX = new ArrayList<String>(Arrays.asList(serviceX.getStemWord().split(",")));
 		List<String> stemWordY = new ArrayList<String>(Arrays.asList(serviceY.getStemWord().split(",")));
+		if(isWordNet){
+			stemWordX.addAll(Arrays.asList(serviceX.getSymanticStemWords().split(",")));
+			stemWordY.addAll(Arrays.asList(serviceY.getSymanticStemWords().split(",")));
+		}
 		return  intersection(stemWordX, stemWordY)/ union(stemWordX, stemWordY);
 	}
 	

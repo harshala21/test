@@ -50,6 +50,14 @@ public class Services {
 		this.apiName = apiName;
 	}
 
+	public Services(long serviceID, String serviceName, String apiName, String stemWord, String semantics) {
+		setServiceID(serviceID);
+		setServiceName(serviceName);
+		setApiName(apiName);
+		setStemWord(stemWord);
+		setSymanticStemWords(semantics);
+	}
+
 	public void setApiName(String apiName) {
 		this.apiName = apiName;
 	}

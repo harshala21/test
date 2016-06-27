@@ -140,15 +140,19 @@ public class Main {
 							}
 						}
 						printMatrix(similarityMatrix);
+						System.out.println("Please type any character and Press return to continue...");
 						sc.next();
-						for(int i = 0 ; i < 4; i++){
+						String nextPhase = "";
+						do{
 							Main.maxValue =0;
 							clusterService.reductionStep(similarityMatrix, Main.row, Main.index);
 							printMatrix(similarityMatrix);
-							sc.next();
-						}
+							System.out.println("Please type \"stop\" to save and return to Main Menu else to continue next Phase of clustering");
+							nextPhase = sc.next();
+						}while(!"Stop".equalsIgnoreCase(nextPhase));
 						break;
 				 	}
+				 	Main.isWordNet = false;
 				 break;
 			 case 2:
 				 	System.out.println("Choosen Flitering");

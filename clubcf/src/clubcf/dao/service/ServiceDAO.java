@@ -209,14 +209,14 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 	
 	public List<Services> getAllDetails(int limit){
 		List<Services> allServices = new ArrayList<Services>();
-		String query = "select id,sid,api,stemword from sample_data order by id limit ?";
+		String query = "select id,sid,api,stemword,semantics from sample_data order by id limit ?";
 		try {
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setInt(1, limit);
 			results = stmt.executeQuery();
 			while(results.next()){
-				allServices.add(new Services(results.getLong(1), results.getString(2), results.getString(3), results.getString(4)));
+				allServices.add(new Services(results.getLong(1), results.getString(2), results.getString(3), results.getString(4),results.getString(5)));
 			}
 		}catch(SQLException e){
 			e.printStackTrace();
