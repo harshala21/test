@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-import javax.sql.rowset.serial.SerialArray;
-
 import clubcf.algo.Stemmer;
 import clubcf.dao.UserDAO;
+import clubcf.dao.cluster.ClusterDAO;
 import clubcf.dao.service.ServiceDAO;
 import clubcf.factory.DBConnection;
 import clubcf.model.ClubCF;
@@ -149,6 +148,9 @@ public class Main {
 							printMatrix(similarityMatrix);
 							System.out.println("Please type \"stop\" to save and return to Main Menu else to continue next Phase of clustering");
 							nextPhase = sc.next();
+							if("Stop".equalsIgnoreCase(nextPhase)){
+								new ClusterDAO().saveCluster(similarityMatrix,allServices);
+							}
 						}while(!"Stop".equalsIgnoreCase(nextPhase));
 						break;
 				 	}

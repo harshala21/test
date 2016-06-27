@@ -12,6 +12,7 @@ import java.util.List;
 
 import clubcf.dao.DAO;
 import clubcf.factory.DBConnection;
+import clubcf.model.Cluster;
 import clubcf.model.ServicePair;
 import clubcf.model.Services;
 
@@ -20,6 +21,14 @@ public class ServiceDAO implements DAO {
 	ResultSet results = null;
 	PreparedStatement stmt = null;
 	DBConnection connection = new DBConnection();
+	public ServiceDAO(Connection con2) {
+		this.con = con2;
+	}
+
+	public ServiceDAO() {
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public Connection openConnection() {
 		return connection.getDBConnection();
