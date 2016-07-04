@@ -19,9 +19,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-/**
- * Created by vinit on 5/22/15.
- */
 public class ReadExcelData {
 	private String FILE_PATH = "SampleData1.xls";
 
