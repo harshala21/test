@@ -40,7 +40,7 @@ public class Main {
 	
 	static {
 		try {
-			JWNL.initialize(new FileInputStream(new File("C:\\Users\\Arvind\\git\\test\\clubcf\\Wordnet\\jwnl14-rc2\\config\\file_properties.xml")));
+			JWNL.initialize(new FileInputStream(new File("F:\\git\\test\\clubcf\\Wordnet\\jwnl14-rc2\\config\\file_properties.xml")));
 			Main.dict = Dictionary.getInstance() ;
 		} catch (FileNotFoundException | JWNLException e) {
 			// TODO Auto-generated catch block
@@ -124,7 +124,7 @@ public class Main {
 				 	case 1:
 				 		ServiceDAO dao = new ServiceDAO();
 						List<Cluster> similarityMatrix = new ArrayList<Cluster>();
-						List<Services> allServices = dao.getAllDetails(10);
+						List<Services> allServices = dao.getAllDetails(100);
 						Clustering clusterService = new Clustering();
 						for(int row=0 ; row < allServices.size(); row++){
 							Cluster cluster = new Cluster(); 

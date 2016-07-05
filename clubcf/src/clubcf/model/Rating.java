@@ -22,7 +22,7 @@ ResultSet results;
 PreparedStatement stmt;
 DBConnection conne = new DBConnection();
 public static ServiceDAO dao = new ServiceDAO();		
-	
+String serviceTable = "",ratingTable="";	
 
 public static void main(String[] args) {
 		dao.getClusterServices(2);
@@ -84,7 +84,7 @@ public static void main(String[] args) {
 		}
 		return servicePair.size() > 0 ? servicePair : null;
 	}
-
+	
 	public void diplayRatingMatrix(){
 		try{
 			System.out.println("Initial Rating Data:");
@@ -97,7 +97,7 @@ public static void main(String[] args) {
 				usersCollection.put(results.getLong(1), results.getString(2));
 			}
 			System.out.print("users\\Servies\t");
-			String servicesQuery = "select sid from sample_data";
+			String servicesQuery = "select sid from "+serviceTable; 
 			stmt = con.prepareStatement(servicesQuery);
 			results = stmt.executeQuery();
 			while (results.next()){
@@ -105,7 +105,7 @@ public static void main(String[] args) {
 			}
 			System.out.println();
 			//String query = "select u.username, rm.ratings, sd.sid from rating_matrix rm inner join  users u on rm.user_id = u.user_id inner join sample_data sd on rm.service_id = sd.id";
-			String ratingData = "select ratings from rating_matrix where user_id = ? order by service_id" ;
+			String ratingData = "select ratings from "+ratingTable+" where user_id = ? order by service_id" ;
 			stmt = con.prepareStatement(ratingData);
 			Iterator<Long> mapItr = usersCollection.keySet().iterator();
 			while (mapItr.hasNext()){

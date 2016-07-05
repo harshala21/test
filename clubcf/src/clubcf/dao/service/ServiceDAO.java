@@ -17,6 +17,9 @@ import clubcf.model.ServicePair;
 import clubcf.model.Services;
 
 public class ServiceDAO implements DAO {
+	
+	String serviceTable = "mahsup_service"; 
+	String ratingTable = "ratings";
 	Connection con = null;
 	ResultSet results = null;
 	PreparedStatement stmt = null;
@@ -54,7 +57,7 @@ public class ServiceDAO implements DAO {
 	public ArrayList<Long> findUnratedServices( double rating, int activeUserID){
 		ArrayList<Long> unRatedServices = new ArrayList<Long>();
 		try{
-			String query = "select service_id from rating_matrix  where ratings = ? and user_id = ?";
+			String query = "select service_id from "+ratingTable+"  where ratings = ? and user_id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setDouble(1, rating);
@@ -76,7 +79,7 @@ public class ServiceDAO implements DAO {
 	public String getServiceName(long serviceID){
 		String serviceName = null;
 		try{
-			String query = "select sid from sample_data where id = ?";
+			String query = "select sid from "+serviceTable+" where id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
@@ -119,7 +122,7 @@ public class ServiceDAO implements DAO {
 		
 		ArrayList<Double> dataDB = new ArrayList<Double>();
 		try{
-			String query = "select ratings from rating_matrix where service_id = ? and ratings != 0";
+			String query = "select ratings from "+ratingTable+" where service_id = ? and ratings != 0";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
@@ -143,7 +146,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 		
 		ArrayList<Double> dataDB = new ArrayList<Double>();
 		try{
-			String query = "select ratings from rating_matrix where service_id ="+serviceID+" and user_id not in  (select user_id from rating_matrix where service_id in ("+getClusterServices(clusterID)+")  and ratings = 0)";
+			String query = "select ratings from "+ratingTable+" where service_id ="+serviceID+" and user_id not in  (select user_id from rating_matrix where service_id in ("+getClusterServices(clusterID)+")  and ratings = 0)";
 			//System.out.println(query);
 			con = openConnection();
 			Statement stmt = con.createStatement();			
@@ -166,7 +169,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 	
 	public double getNonZeroRatingSize(long serviceID){
 		double ratingCount = 0;
-		String query = "select count(ratings) from rating_matrix where service_id =? and ratings != 0";
+		String query = "select count(ratings) from "+ratingTable+" where service_id =? and ratings != 0";
 		try {
 			con = openConnection();
 			stmt = con.prepareStatement(query);
@@ -218,7 +221,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 	
 	public List<Services> getAllDetails(int limit){
 		List<Services> allServices = new ArrayList<Services>();
-		String query = "select id,sid,api,stemword,semantics from sample_data order by id limit ?";
+		String query = "select id,sid,api,stemword,semantics from "+serviceTable+" order by id limit ?";
 		try {
 			con = openConnection();
 			stmt = con.prepareStatement(query);
@@ -287,7 +290,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 	public double getMean(long unRatedServiceID) {
 		double mean = 0;
 		try{
-			String query = "select avg(ratings) from rating_matrix where service_id = ?";
+			String query = "select avg(ratings) from "+ratingTable+" where service_id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, unRatedServiceID);
@@ -308,7 +311,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 	public double getRating(long serviceID, long activeUserID) {
 		double rating = 0;
 		try{
-			String query = "select ratings from rating_matrix where service_id = ? and user_id = ?";
+			String query = "select ratings from "+ratingTable+" where service_id = ? and user_id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
@@ -331,7 +334,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 	public String getAPIName(long serviceID) {
 		String rating = null;
 		try{
-			String query = "select api from sample_data where id = ?";
+			String query = "select api from "+serviceTable+" where id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
@@ -353,8 +356,8 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 	public void updateSemanticWordToDB(HashSet<String> semanticWords, long serviceID) {
 		String semantics = prepareSemantics(semanticWords);
 		try{
-			String cleanUpQuery = "update sample_data set semantics = null where id = ?";
-			String query = "update sample_data set semantics = ? where id =? ";
+			String cleanUpQuery = "update "+serviceTable+" set semantics = null where id = ?";
+			String query = "update "+serviceTable+" set semantics = ? where id =? ";
 			con = openConnection();
 			stmt = con.prepareStatement(cleanUpQuery);
 			stmt.setLong(1, serviceID);
