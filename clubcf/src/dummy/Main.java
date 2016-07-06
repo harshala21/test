@@ -198,7 +198,7 @@ public class Main {
 				 for(Services service : Main.predictedRatings){
 					mea += service.getPredictedRatingDifference();
 				 }
-				 System.out.println("MEA: "+mea/Main.predictedRatings.size());
+				 System.out.println("MAE: "+ mea/Main.predictedRatings.size());
 				 break;
 			 case 5: 
 				try {
@@ -284,7 +284,7 @@ public class Main {
 
 	private static int printMenu(Scanner sc) {
 		try{
-			System.out.println("\n\n\t\tMain Menu\n0. Exit\n1. Phase I Clustering\n2. Flitering\n3. Recommendation\n4. Result\n5. Update Data");
+			System.out.println("\n\n\t\tMain Menu\n0. Exit\n1. Clustering\n2. Collaborative Flitering\n3. Recommendations \n4. Result (Mean Absolute Error)\n5. Update Data");
 			System.out.print("Your Choice: ");
 			return sc.nextInt();
 		 }catch(Exception e){
@@ -296,7 +296,7 @@ public class Main {
 	
 	private static int printClusteringMenu(Scanner sc) {
 		try{
-			System.out.println("0. Previous Menu \n1. Without WordNet\n2. With WordNet");
+			System.out.println("0. Previous Menu \n1. Without Semantic Analysis\n2. With Semantic Analysis");
 			System.out.print("Your Choice: ");
 			return sc.nextInt();
 		 }catch(Exception e){

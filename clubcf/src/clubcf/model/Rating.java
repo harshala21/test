@@ -22,7 +22,7 @@ ResultSet results;
 PreparedStatement stmt;
 DBConnection conne = new DBConnection();
 public static ServiceDAO dao = new ServiceDAO();		
-String serviceTable = "",ratingTable="";	
+String serviceTable = "sample_data",ratingTable="rating_matrix";	
 
 public static void main(String[] args) {
 		dao.getClusterServices(2);

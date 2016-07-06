@@ -18,8 +18,8 @@ import clubcf.model.Services;
 
 public class ServiceDAO implements DAO {
 	
-	String serviceTable = "mahsup_service"; 
-	String ratingTable = "ratings";
+	String serviceTable = "sample_data"; 
+	String ratingTable = "rating_matrix";
 	Connection con = null;
 	ResultSet results = null;
 	PreparedStatement stmt = null;
