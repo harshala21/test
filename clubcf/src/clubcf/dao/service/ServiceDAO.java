@@ -119,7 +119,6 @@ public class ServiceDAO implements DAO {
 	}
 
 	public double[] getSimlarityRatings(long serviceID) {
-		
 		ArrayList<Double> dataDB = new ArrayList<Double>();
 		try{
 			String query = "select ratings from "+ratingTable+" where service_id = ? and ratings != 0";
@@ -143,7 +142,6 @@ public class ServiceDAO implements DAO {
 	}
 	
 public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
-		
 		ArrayList<Double> dataDB = new ArrayList<Double>();
 		try{
 			String query = "select ratings from "+ratingTable+" where service_id ="+serviceID+" and user_id not in  (select user_id from rating_matrix where service_id in ("+getClusterServices(clusterID)+")  and ratings = 0)";
@@ -163,7 +161,6 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 			close(results);
 			close(con);
 		}
-		
 		return convertToArray(dataDB);
 	}
 	
@@ -201,7 +198,6 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 		double ratingCount = 0;
 		String query = "select count(ratings) from rating_matrix where service_id = ? and user_id not in (select user_id from rating_matrix where ratings = 0 and service_id = ?);";
 		try {
-			
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, pair.getOtherServiceID());
@@ -254,7 +250,6 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 					services += s + ",";
 				services = services.substring(0, services.length()-1);
 			}
-			//System.out.println(services);
 		}catch (SQLException e){
 			e.printStackTrace();
 		}finally {
@@ -334,11 +329,10 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 	public String getAPIName(long serviceID) {
 		String rating = null;
 		try{
-			String query = "select api from "+serviceTable+" where id = ?";
+			String query = "select sname from "+serviceTable+" where id = ?";
 			con = openConnection();
 			stmt = con.prepareStatement(query);
 			stmt.setLong(1, serviceID);
-			
 			results = stmt.executeQuery();
 			if(results.next()){
 				rating =  results.getString(1);
@@ -365,9 +359,7 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 			stmt = con.prepareStatement(query);
 			stmt.setString(1, semantics);
 			stmt.setLong(2, serviceID);
-			
 			stmt.executeUpdate();
-			
 		}catch (SQLException w){
 			System.out.println(semantics.length());
 			System.out.println(semantics);
@@ -386,6 +378,27 @@ public double[] getSimlarityRatingsWithOutZero(long serviceID,long clusterID) {
 		while (itr.hasNext())
 			semantics += itr.next()+",";
 		return semantics.isEmpty() ? "" : semantics.substring(0, semantics.length()-1);
+	}
+
+	public String getUserName(long activeuser) {
+		String userName = null;
+		try{
+			String query = "select username from users where user_id =? ";
+			con = openConnection();
+			stmt = con.prepareStatement(query);
+			stmt.setLong(1, activeuser);
+			results = stmt.executeQuery();
+			while(results.next()){
+				userName = results.getString(1);
+			}
+		}catch (SQLException w){
+			w.printStackTrace();
+		}finally {
+			close(stmt);
+			close(results);
+			close(con);
+		}
+		return userName;
 	}
 
 }

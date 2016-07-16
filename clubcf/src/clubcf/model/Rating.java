@@ -38,8 +38,6 @@ public static void main(String[] args) {
 	}
 
 	private void calculateRatingSimialrity(ArrayList<ServicePair> pairList) {
-		/*double[] unRated = null;
-		double[] otherService = null;*/
 		double meanUnRated = 0;
 		double meanOther = 0;
 		
@@ -65,7 +63,6 @@ public static void main(String[] args) {
 				services = results.getString(2);
 				clusterName = results.getString(1);
 			}
-			
 			String[] serviceList = services.split(",");
 			for(String serviceID : serviceList){
 				if(id == Long.parseLong(serviceID))
@@ -74,7 +71,6 @@ public static void main(String[] args) {
 					servicePair.add(new ServicePair(id,Long.parseLong(serviceID),clusterID));
 				}
 			}
-			
 		}catch(SQLException e){
 			e.printStackTrace();
 		}finally {
@@ -104,7 +100,6 @@ public static void main(String[] args) {
 				System.out.print(results.getString(1)+"\t");
 			}
 			System.out.println();
-			//String query = "select u.username, rm.ratings, sd.sid from rating_matrix rm inner join  users u on rm.user_id = u.user_id inner join sample_data sd on rm.service_id = sd.id";
 			String ratingData = "select ratings from "+ratingTable+" where user_id = ? order by service_id" ;
 			stmt = con.prepareStatement(ratingData);
 			Iterator<Long> mapItr = usersCollection.keySet().iterator();
@@ -161,7 +156,6 @@ public static void main(String[] args) {
 				clusterID = results.getLong(1);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			conne.close(stmt);
@@ -172,11 +166,8 @@ public static void main(String[] args) {
 	}
 	
 	public double calculateRatingSimilarity(double[] serviceX,double[] serviceY,double meanX, double meanY){
-		//double meanX = getMean(serviceX);
-		//double meanY = getMean(serviceY);
 		double numerator = 0;
 		double denominatorX = 0, denominatorY = 0;
-		
 		for(int i = 0; i < serviceX.length && i < serviceY.length ; i++){
 			numerator += (serviceX[i] - meanX)*( serviceY[i] - meanY);
 			denominatorX += Math.pow((serviceX[i] - meanX), 2);

@@ -37,7 +37,6 @@ import net.didion.jwnl.dictionary.Dictionary;
 
 public class Main {
 
-	
 	static {
 		try {
 			JWNL.initialize(new FileInputStream(new File("F:\\git\\test\\clubcf\\Wordnet\\jwnl14-rc2\\config\\file_properties.xml")));
@@ -59,10 +58,7 @@ public class Main {
 	public static long activeService = 0; 
 	
 	private static void demonstrateTreeOperation(IndexWord word, HashSet<String> semanticWords) throws JWNLException {
-		// Get all the hyponyms (children) of the first sense of <var>word</var>
 		PointerTargetTree hyponyms = PointerUtils.getInstance().getHyponymTree(word.getSense(1));
-		//System.out.println("Hyponyms of \"" + word.getLemma() + "\":");
-	
 		Iterator<PointerTargetTreeNode> itr = hyponyms.getRootNode().getChildTreeList().iterator();
 		while(itr.hasNext()){
 			PointerTargetTreeNode node = itr.next();
@@ -73,12 +69,6 @@ public class Main {
 		}
 	}
 	
-	 /*public static void main(String[] args){
-		 Scanner sc = new Scanner(System.in);
-		 System.out.print("Please enter any word: ");
-		 
-	 }
-	 */
 	public static void main(String[] args){
 		System.out.println("Club CF");
 		Scanner sc = new Scanner(System.in);
@@ -87,7 +77,7 @@ public class Main {
 			 choice  = printMenu(sc);
 			 switch(choice){
 			 case 1:
-				 	System.out.println("Choosen Clustering");
+				 	System.out.println("Clustering Phase");
 				 	int innerChoice = printClusteringMenu(sc);
 				 	switch(innerChoice){
 				 	case 0:
@@ -107,7 +97,6 @@ public class Main {
 				 				for(String stem : stemWords){
 				 					IndexWordSet synonyms = Main.dict.lookupAllIndexWords(stem);
 				 					for(IndexWord s : synonyms.getIndexWordArray()){
-										 //System.out.println(s.getLemma());
 										 demonstrateTreeOperation(s,semanticWords);
 									 }
 				 				}
@@ -115,9 +104,7 @@ public class Main {
 				 				dao.updateSemanticWordToDB(semanticWords,service.getServiceID());
 				 				serviceCount++;
 				 			}
-							 //IndexWordSet synonyms = Main.dict.lookupAllIndexWords(sc.next());
 						} catch (JWNLException e) {
-							// TODO Auto-generated catch block	
 							e.printStackTrace();
 						}
 				 		isWordNet = true;
@@ -157,7 +144,7 @@ public class Main {
 				 	Main.isWordNet = false;
 				 break;
 			 case 2:
-				 	System.out.println("Choosen Flitering");
+				 	System.out.println("Collaorative Filtering Phase");
 				 	Rating rating = new Rating();
 				 	int activeUserID = printAndAcceptUser(sc);
 				 	Main.activeuser = activeUserID;
@@ -170,10 +157,10 @@ public class Main {
 				 break;
 			 case 3:
 				 if(Main.predictedRatings.isEmpty())
-					 System.out.println("Please other actions before this.");
+					 System.out.println("Please complete other actions before this.");
 				 else {
 					 ServiceDAO dao = new ServiceDAO();
-					 System.out.println("Recommendation for "+dao.getServiceName(Main.activeService)+ " are (Acending order):");
+					 System.out.println("Recommendation for "+dao.getUserName(Main.activeuser)+ " are (Acending order):");
 					 Comparator<Services> comparator = new Comparator<Services>() {	
 						    public int compare(Services a, Services b) {
 						        if(a.getPredictedRatingDifference() > b.getPredictedRatingDifference())
@@ -209,47 +196,28 @@ public class Main {
 					List<ClubCF> dbList = connection.getDBRecords(Main.limit);
 					float alpha = (float) 0.5;
 					String outPut = "";
-					
 					float matrix[][] = new float[Main.limit][Main.limit];
-					
 					for (int i = 0; i < dbList.size(); i++) {
 						ClubCF t1 = (ClubCF) dbList.get(i);
-						List<String> list1 = new ArrayList<String>(Arrays.asList(t1
-								.getStemWord().split(",")));
-						List<String> list3 = new ArrayList<String>(Arrays.asList(t1
-								.getApis().split(",")));
-						
+						List<String> list1 = new ArrayList<String>(Arrays.asList(t1.getStemWord().split(",")));
+						List<String> list3 = new ArrayList<String>(Arrays.asList(t1.getApis().split(",")));
 						for (int j = 0; j < dbList.size(); j++) {
 							outPut += "'";
 							ClubCF t2 = (ClubCF) dbList.get(j);
-							List<String> list2 = new ArrayList<String>(Arrays.asList(t2
-									.getStemWord().split(",")));
-							List<String> list4 = new ArrayList<String>(Arrays.asList(t2
-									.getApis().split(",")));
-
-							float D_sim = new Main().intersection(list1, list2)
-									/ new Main().union(list1, list2);
-							float F_sim = new Main().intersection(list3, list4)
-									/ new Main().union(list3, list4);
-
+							List<String> list2 = new ArrayList<String>(Arrays.asList(t2.getStemWord().split(",")));
+							List<String> list4 = new ArrayList<String>(Arrays.asList(t2.getApis().split(",")));
+							float D_sim = new Main().intersection(list1, list2)	/ new Main().union(list1, list2);
+							float F_sim = new Main().intersection(list3, list4) / new Main().union(list3, list4);
 							float C_Sim = (float) (alpha * D_sim + (1 - alpha) * F_sim);
-
 							String output = String.format("%.3f", C_Sim);
-
-							//System.out.print(" " + output + " ");
-							
 							matrix[i][j] = C_Sim;
-							
 							outPut += output + "'";
 							if ((j + 1) < dbList.size()) {
 								outPut += ",";
 							}
 						}
-						// connection.insertInAverageDB(outPut);
-						//System.out.print("\n");
 					}
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				 break;
@@ -267,7 +235,6 @@ public class Main {
 		int count = new UserDAO().getUsersCount();
 		int input = -1;
 		try{
-			
 			System.out.println("Enter User ID ( from 1 to "+count+" )");
 			System.out.print("Your Choice: ");
 			input =  sc.nextInt();
@@ -290,7 +257,6 @@ public class Main {
 		 }catch(Exception e){
 			 System.out.println("Input should be only be Integers!\n Halting System ");
 		 }
-		
 		return 0;	
 	}
 	
@@ -302,11 +268,8 @@ public class Main {
 		 }catch(Exception e){
 			 System.out.println("Input should be only be Integers!\n Halting System ");
 		 }
-		
 		return 0;	
 	}
-	
-	
 
 	public static void getMax(List<Double> similarity, int row) {
 		int index = 0;
@@ -384,22 +347,18 @@ public class Main {
 	
 	public float union(List list1, List list2) {	
 		Set set = new HashSet();
-
 		set.addAll(list1);
 		set.addAll(list2);
-
 		return set.size();
 	}
 
 	public float intersection(List list1, List list2) {
 		List list = new ArrayList();
-
 		for (String t : (ArrayList<String>) list1) {
 			if (list2.contains(t)) {
 				list.add(t);
 			}
 		}
-
 		return list.size();
 	}
 }

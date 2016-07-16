@@ -79,7 +79,7 @@ public class Clustering {
 		removeRow(similarityMatrix,index);
 		similarityMatrix.get(row).setName(similarityMatrix.get(row).getName()+","+columnService);
 		}catch(Exception e ){
-			//eat it
+			e.printStackTrace();
 		}
 	}
 
@@ -97,10 +97,7 @@ public class Clustering {
 				Main.getMax(similarityValues, index);
 			}
 		}catch(IndexOutOfBoundsException e){
-			/*System.out.println("index:\t"+index+"\n Row:\t"+row+"\nColumn:\t"+column);
-			System.out.println("matrix:\t"+similarityMatrix.size()+"\n Values:\t"+similarityValues.size());
-			e.printStackTrace();*/
-			//eat it.
+			e.printStackTrace();
 		}
 	}
 
